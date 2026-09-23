@@ -36,6 +36,7 @@ class TitleScene {
     }
     if (this.opts) { this.opts.update(); return; }
     const n = this.items().length;
+    if (Input.tapSelect(this, Input.rowHits(n, Game.W / 2 - 140, 483, 280, 50))) return;
     if (Input.repeat('up')) { this.index = (this.index + n - 1) % n; Sound.sfx('sfx_cursor', { volume: 0.5 }); }
     if (Input.repeat('down')) { this.index = (this.index + 1) % n; Sound.sfx('sfx_cursor', { volume: 0.5 }); }
     if (Input.isPressed('ok')) this.select();

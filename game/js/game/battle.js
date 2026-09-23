@@ -846,6 +846,10 @@ class BattleScene {
     ui.t++;
     const n = ui.type === 'target' ? ui.cands.length : ui.type === 'list' ? ui.list.length : ui.options.length;
     const cursor = (d) => { ui.index = (ui.index + d + n) % n; Sound.sfx('sfx_cursor', { volume: 0.5 }); };
+    // taps: commands and targets act on one tap, skill/item lists highlight first (to show the description).
+    // Taps right as a menu opens were meant for the text before it.
+    if (ui.t <= 10) Input.takeTap();
+    else if (Input.tapSelect(ui, this.menuHits(ui), ui.type === 'list')) return;
     if (ui.type === 'party' || ui.type === 'actor') {
       if (Input.repeat('up') || (ui.type === 'party' && Input.repeat('left'))) cursor(-1);
       if (Input.repeat('down') || (ui.type === 'party' && Input.repeat('right'))) cursor(1);
@@ -880,6 +884,51 @@ class BattleScene {
       if (Input.isPressed('ok')) { Sound.sfx('sfx_confirm', { volume: 0.6 }); this.closeMenu(ui.index); }
       else if (Input.isPressed('cancel')) { Sound.sfx('sfx_cancel', { volume: 0.6 }); this.closeMenu('back'); }
     }
+  }
+
+  // where each command menu sits (shared by drawing and tap hit-testing)
+  menuBox(ui) {
+    if (ui.type === 'party') {
+      const first = this.party[0] ? this.cardRect(this.party[0]) : { x: 16, y: 532, w: 226 };
+      const w = 300, h = 58;
+      return { x: U.clamp(first.x, 10, Game.W - w - 10), y: first.y - h - 20, w, h };
+    }
+    if (ui.type === 'actor') {
+      const r = this.cardRect(ui.actor);
+      const w = 196, h = ui.options.length * 40 + 22;
+      return { x: U.clamp(r.x + r.w / 2 - w / 2, 10, Game.W - w - 10), y: r.y - h - 24, w, h };
+    }
+    const rows = Math.ceil(ui.list.length / 2);
+    return { x: 40, y: 190, w: Game.W - 80, h: Math.max(1, Math.min(rows, 6)) * 44 + 86 };
+  }
+
+  // first entry shown by a two-column list (6 rows); it only scrolls when the cursor leaves the window
+  listFirst(ui) {
+    const row = Math.floor(ui.index / 2), rows = Math.ceil(ui.list.length / 2);
+    ui.top = U.clamp(U.clamp(ui.top || 0, row - 5, row), 0, Math.max(0, rows - 6));
+    return ui.top * 2;
+  }
+
+  menuHits(ui) {
+    if (ui.type === 'target') {
+      return ui.cands.map((t, i) => {
+        if (t.side !== 'enemy') return { i, ...this.cardRect(t) };
+        const img = Assets.get(t.sprite), h = t.h * t.scale;
+        const w = Math.max(130, img ? h * img.width / img.height : h * 0.8);
+        return { i, x: t.drawX - w / 2, y: t.y + t.drop - h - 30, w, h: h + 60 };
+      });
+    }
+    const b = this.menuBox(ui);
+    if (ui.type === 'party') {
+      const bw = (b.w - 24) / 2;
+      return ui.options.map((o, i) => ({ i, x: b.x + 12 + i * bw, y: b.y, w: bw, h: b.h }));
+    }
+    if (ui.type === 'actor') return Input.rowHits(ui.options.length, b.x, b.y + 10, b.w, 40);
+    const first = this.listFirst(ui), out = [];
+    for (let i = first; i < Math.min(ui.list.length, first + 12); i++) {
+      out.push({ i, x: b.x + 10 + (i % 2) * (b.w / 2 - 10), y: b.y + 12 + ((i - first) >> 1) * 44, w: b.w / 2 - 18, h: 44 });
+    }
+    return out;
   }
 
   // ------------------------------------------------------------------ drawing
@@ -1165,8 +1214,7 @@ class BattleScene {
     const ui = this.ui;
     if (!ui) return;
     if (ui.type === 'party') {
-      const first = this.party[0] ? this.cardRect(this.party[0]) : { x: 16, y: 532, w: 226 };
-      const w = 300, h = 58, x = U.clamp(first.x, 10, Game.W - w - 10), y = first.y - h - 20;
+      const { x, y, w, h } = this.menuBox(ui);
       Gfx.box(ctx, x, y, w, h, {});
       ui.options.forEach((o, i) => {
         const xx = x + 12 + i * (w - 24) / 2, bw = (w - 24) / 2;
@@ -1177,9 +1225,7 @@ class BattleScene {
       return;
     }
     if (ui.type === 'actor') {
-      const r = this.cardRect(ui.actor);
-      const w = 196, h = ui.options.length * 40 + 22;
-      const x = U.clamp(r.x + r.w / 2 - w / 2, 10, Game.W - w - 10), y = r.y - h - 24;
+      const { x, y, w, h } = this.menuBox(ui);
       Gfx.box(ctx, x, y, w, h, {});
       ui.options.forEach((o, i) => {
         const yy = y + 12 + i * 40;
@@ -1189,9 +1235,9 @@ class BattleScene {
       return;
     }
     if (ui.type === 'list') {
-      const x = 40, y = 190, w = Game.W - 80, rows = Math.ceil(ui.list.length / 2), h = Math.max(1, Math.min(rows, 6)) * 44 + 86;
+      const { x, y, w, h } = this.menuBox(ui);
       Gfx.box(ctx, x, y, w, h, {});
-      const first = Math.max(0, Math.floor(ui.index / 2) - 5) * 2;
+      const first = this.listFirst(ui);
       ui.list.slice(first, first + 12).forEach((id, j) => {
         const i = first + j;
         const col = i % 2, row = Math.floor(j / 2);
@@ -1236,6 +1282,7 @@ const GameOver = {
         update(active) {
           this.t++;
           if (!active || this.t < 60) return;
+          if (Input.tapSelect(this, Input.rowHits(2, Game.W / 2 - 140, 505, 280, 50))) return;
           if (Input.repeat('up') || Input.repeat('down')) { this.index = 1 - this.index; Sound.sfx('sfx_cursor', { volume: 0.5 }); }
           if (Input.isPressed('ok')) {
             Sound.sfx('sfx_confirm');

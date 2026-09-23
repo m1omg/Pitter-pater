@@ -286,6 +286,9 @@ class ChoiceBox {
     this.t++;
     this.anim = Math.min(1, this.anim + 0.2);
     if (!active) return;
+    // taps right as the box appears were meant for the text before it
+    if (this.t <= 14) Input.takeTap();
+    else if (Input.tapSelect(this, Input.rowHits(this.options.length, this.x, this.y + 14, this.w, 40))) return;
     if (Input.repeat('up')) { this.index = (this.index + this.options.length - 1) % this.options.length; Sound.sfx('sfx_cursor', { volume: 0.5 }); }
     if (Input.repeat('down')) { this.index = (this.index + 1) % this.options.length; Sound.sfx('sfx_cursor', { volume: 0.5 }); }
     if (Input.isPressed('ok')) { Input.consume('ok'); Sound.sfx('sfx_confirm', { volume: 0.6 }); this.finish(this.index); }

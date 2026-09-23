@@ -144,7 +144,7 @@ const Game = {
       ctx.globalAlpha = 1;
     }
     const ts = Input.ts;
-    if (Input.usingTouch && ts.id != null && !ts.multi && ts.moved) this.drawTouchStick(ctx, ts);
+    if (State.options.touchStick && Input.usingTouch && ts.id != null && !ts.multi && ts.moved) this.drawTouchStick(ctx, ts);
     if (this.showFps) Gfx.text(ctx, Math.round(this._fps) + ' fps  k=' + this.k, 8, 20, { size: 16, color: '#fff', outline: '#000', outlineWidth: 3 });
     if (this.errors.length) {
       ctx.fillStyle = 'rgba(120,0,0,0.85)';

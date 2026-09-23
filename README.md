@@ -36,12 +36,15 @@ Gamepads work too (A = confirm, B = cancel).
 
 | Gesture | Action |
 |---|---|
+| Tap a menu option | choose it; in battle, tap an enemy or a friend's card to target them |
 | Swipe | walk one step, or move a menu cursor |
 | Swipe and hold | keep walking (hold further out to run) |
-| One-finger tap | confirm, talk, examine (like Z) |
+| One-finger tap | talk, examine, continue text (like Z) |
 | Two-finger tap | back, open the menu (like X) |
 
-Landscape works best on phones.
+In lists that describe the highlighted entry (skills, items, stickers, the shop) and when saving, the first tap
+highlights an entry and a second tap chooses it. OPTIONS → *Touch joystick* shows a thumb-stick under your finger
+while you swipe. Landscape works best on phones.
 
 It takes about 1–2 hours. Save at the glowing lights in the dream and at Pim's bed at home.
 You get three save files.

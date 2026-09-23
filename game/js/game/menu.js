@@ -15,6 +15,13 @@ function listNav(o, n, cols = 1) {
   }
 }
 
+// first visible entry of a scrolling list; it only scrolls when the cursor leaves the window
+// (so a tap on a visible row never shifts the rows under the finger)
+function scrollTop(o, n, rows) {
+  const t = U.clamp(o.top || 0, o.index - rows + 1, o.index);
+  return (o.top = U.clamp(t, 0, Math.max(0, n - rows)));
+}
+
 function drawFace(ctx, id, face, x, y, s, bg) {
   const ch = CHARACTERS[id];
   Gfx.roundRect(ctx, x, y, s, s, 12);
@@ -50,7 +57,16 @@ class PauseMenu {
     this.t++;
     this.anim = Math.min(1, this.anim + 0.15);
     if (!active) return;
-    if (this.sub) { this.sub.update(); return; }
+    const hits = Input.rowHits(this.options.length, 24, 35, 200, 48);
+    if (this.sub) {
+      const i = Input.hitIndex(hits, Input.tapPos);
+      if (i < 0) { this.sub.update(); return; }
+      // tapping the left column while a panel is open switches straight to that entry
+      Input.takeTap();
+      if (i === this.index) return;
+      this.sub = null; this.index = i;
+      Input.pressed.ok = true;
+    } else if (Input.tapSelect(this, hits)) return;
     listNav(this, this.options.length);
     if (Input.isPressed('cancel') || Input.isPressed('menu')) { this.close(); return; }
     if (Input.isPressed('ok')) {
@@ -121,6 +137,7 @@ class PauseMenu {
 class PartyPicker {
   constructor() { this.index = 0; this.active = false; }
   update(onPick, onCancel) {
+    if (Input.tapSelect(this, Input.rowHits(State.d.party.length, 244, 24, 692, 120))) return;
     listNav(this, State.d.party.length);
     if (Input.isPressed('ok')) { Sound.sfx('sfx_confirm', { volume: 0.6 }); onPick(State.d.party[this.index]); }
     else if (Input.isPressed('cancel')) { Sound.sfx('sfx_cancel', { volume: 0.5 }); onCancel(); }
@@ -154,6 +171,14 @@ class ItemsPanel {
       return;
     }
     const L = this.list();
+    const tab = Input.hitIndex(this.tabs.map((t, i) => ({ i, x: 244 + 24 + i * 180, y: 36, w: 164, h: 48 })), Input.tapPos);
+    if (tab >= 0) {
+      Input.takeTap();
+      if (tab !== this.tab) { this.tab = tab; this.index = 0; Sound.sfx('sfx_cursor', { volume: 0.5 }); }
+      return;
+    }
+    const top = scrollTop(this, L.length, 11);
+    if (Input.tapSelect(this, Input.rowHits(Math.min(11, L.length - top), 260, 96, 660, 44, top), true)) return;
     if (Input.repeat('left')) { this.tab = (this.tab + 2) % 3; this.index = 0; Sound.sfx('sfx_cursor', { volume: 0.5 }); }
     if (Input.repeat('right')) { this.tab = (this.tab + 1) % 3; this.index = 0; Sound.sfx('sfx_cursor', { volume: 0.5 }); }
     listNav(this, L.length);
@@ -181,7 +206,7 @@ class ItemsPanel {
     Gfx.text(ctx, '◀ ▶', x + w - 40, y + 45, { size: 18, align: 'right', color: Gfx.C.inkSoft });
     const L = this.list();
     if (!L.length) Gfx.text(ctx, 'Nothing here yet.', x + 40, y + 110, { size: 26, color: Gfx.C.inkSoft });
-    const first = Math.max(0, this.index - 9);
+    const first = scrollTop(this, L.length, 11);
     L.slice(first, first + 11).forEach((iid, j) => {
       const i = first + j, yy = y + 74 + j * 44;
       const it = ITEMS[iid];
@@ -209,12 +234,13 @@ class SkillsPanel {
       return;
     }
     const L = State.actor(this.who).skills.filter((s) => SKILLS[s] && !SKILLS[s].hidden);
-    listNav(this, L.length);
-    if (Input.isPressed('cancel')) { Sound.sfx('sfx_cancel', { volume: 0.5 }); if (this.target) { this.target = null; this.showParty = false; return; } this.who = null; this.showParty = true; return; }
     if (this.target) {
       this.target.update((pid) => this.useField(L[this.index], pid), () => { this.target = null; this.showParty = false; });
       return;
     }
+    if (Input.tapSelect(this, Input.rowHits(L.length, 260, 130, 660, 44), true)) return;
+    listNav(this, L.length);
+    if (Input.isPressed('cancel')) { Sound.sfx('sfx_cancel', { volume: 0.5 }); this.who = null; this.showParty = true; return; }
     if (Input.isPressed('ok') && this.fieldSkills()[L[this.index]]) {
       const sk = SKILLS[L[this.index]], a = State.actor(this.who);
       if (a.pep < sk.cost || a.hp <= 0) { Sound.sfx('sfx_buzzer'); return; }
@@ -270,6 +296,7 @@ class StickerPanel {
   update() {
     if (!this.who) { this.picker.update((id) => { this.who = id; this.index = 0; this.showParty = false; }, () => { this.menu.sub = null; }); return; }
     const L = this.list();
+    if (Input.tapSelect(this, Input.rowHits(L.length, 260, 140, 660, 44), true)) return;
     listNav(this, L.length);
     if (Input.isPressed('cancel')) { Sound.sfx('sfx_cancel', { volume: 0.5 }); this.who = null; this.showParty = true; return; }
     if (Input.isPressed('ok')) {
@@ -326,8 +353,25 @@ class OptionsPanel {
       { label: 'Screen shake', get: () => (State.options.screenShake ? 'On' : 'Off'), change: () => { State.options.screenShake = !State.options.screenShake; } },
       { label: Input.isTouchUI() ? 'Fullscreen' : 'Fullscreen (F4)', get: () => (document.fullscreenElement ? 'On' : 'Off'), change: () => Input.toggleFullscreen() },
     ];
+    if (Input.touchDevice || Input.usingTouch) this.items.push({ label: 'Touch joystick', get: () => (State.options.touchStick ? 'On' : 'Off'), change: () => { State.options.touchStick = !State.options.touchStick; } });
+  }
+  rect() {
+    return this.menu ? { x: 244, y: 24, w: 692 } : { x: 180, y: 150, w: 600 };
   }
   update() {
+    const tap = Input.takeTap();
+    if (tap) {
+      // tap a row to highlight it (again to change it), or tap the ◀ / ▶ side of its value
+      const { x, y, w } = this.rect();
+      const i = Input.hitIndex(Input.rowHits(this.items.length, x + 16, y + 72, w - 32, 54), tap);
+      if (i < 0) return;
+      const it = this.items[i];
+      const d = tap.x >= x + w - 250 ? (tap.x < x + w - 105 ? -1 : 1) : i === this.index ? 1 : 0;
+      this.index = i;
+      if (d) { it.change(d); State.saveOptions(); }
+      Sound.sfx('sfx_cursor', { volume: 0.5 });
+      return;
+    }
     listNav(this, this.items.length);
     const it = this.items[this.index];
     if (Input.repeat('left')) { it.change(-1); State.saveOptions(); Sound.sfx('sfx_cursor', { volume: 0.5 }); }
@@ -335,7 +379,7 @@ class OptionsPanel {
     if (Input.isPressed('cancel')) { Sound.sfx('sfx_cancel', { volume: 0.5 }); State.saveOptions(); if (this.onClose) this.onClose(); else this.menu.sub = null; }
   }
   draw(ctx) {
-    const x = this.menu ? 244 : 180, y = this.menu ? 24 : 150, w = this.menu ? 692 : 600, h = this.items.length * 54 + 100;
+    const { x, y, w } = this.rect(), h = this.items.length * 54 + 100;
     Gfx.box(ctx, x, y, w, h, {});
     Gfx.text(ctx, 'OPTIONS', x + 30, y + 50, { size: 32, font: Gfx.BOLD });
     this.items.forEach((it, i) => {
@@ -356,6 +400,8 @@ const SaveMenu = {
         update(active) {
           this.t++;
           if (!active) return;
+          if (this.saved > 0) { if (--this.saved === 0) { Game.removeOverlay(o); resolve(true); } return; }
+          if (Input.tapSelect(this, Input.rowHits(3, 110, 125, 740, 170), mode === 'save')) return;
           listNav(this, 3);
           if (Input.isPressed('cancel')) { Sound.sfx('sfx_cancel', { volume: 0.5 }); Game.removeOverlay(o); resolve(false); return; }
           if (Input.isPressed('ok')) {
@@ -371,7 +417,6 @@ const SaveMenu = {
               resolve(slot);
             }
           }
-          if (this.saved > 0 && --this.saved === 0) { Game.removeOverlay(o); resolve(true); }
         },
         draw(ctx) {
           ctx.fillStyle = 'rgba(27,22,34,0.6)'; ctx.fillRect(0, 0, Game.W, Game.H);
@@ -414,6 +459,14 @@ const Shop = {
           if (!active) return;
           if (this.qty) {
             const it = ITEMS[stock[this.index]];
+            const tap = Input.takeTap();
+            if (tap) {
+              // ◀ / ▶ change the amount, BUY buys
+              const b = Input.hitIndex([{ i: 0, x: 640, y: 434, w: 62, h: 66 }, { i: 1, x: 730, y: 434, w: 56, h: 66 }, { i: 2, x: 640, y: 510, w: 260, h: 56 }], tap);
+              if (b === 0 && this.qty > 1) { this.qty--; Sound.sfx('sfx_cursor', { volume: 0.5 }); }
+              if (b === 1 && this.qty < 99) { this.qty++; Sound.sfx('sfx_cursor', { volume: 0.5 }); }
+              if (b === 2) Input.pressed.ok = true;
+            }
             if (Input.repeat('up') || Input.repeat('right')) { this.qty = Math.min(this.qty + 1, 99); Sound.sfx('sfx_cursor', { volume: 0.5 }); }
             if (Input.repeat('down') || Input.repeat('left')) { this.qty = Math.max(1, this.qty - 1); Sound.sfx('sfx_cursor', { volume: 0.5 }); }
             if (Input.isPressed('ok')) {
@@ -424,6 +477,8 @@ const Shop = {
             } else if (Input.isPressed('cancel')) { this.qty = 0; Sound.sfx('sfx_cancel', { volume: 0.5 }); }
             return;
           }
+          if (this.bought > 0) this.bought--;
+          if (Input.tapSelect(this, Input.rowHits(stock.length, 76, 108, 528, 44), true)) return;
           listNav(this, stock.length);
           if (Input.isPressed('ok')) { Sound.sfx('sfx_confirm', { volume: 0.6 }); this.qty = 1; }
           if (Input.isPressed('cancel')) {
@@ -432,7 +487,6 @@ const Shop = {
             if (opts.music !== false && prevBgm) Sound.restoreBgm(0.6);
             resolve();
           }
-          if (this.bought > 0) this.bought--;
         },
         draw(ctx) {
           ctx.fillStyle = 'rgba(27,22,34,0.45)'; ctx.fillRect(0, 0, Game.W, Game.H);
@@ -459,7 +513,14 @@ const Shop = {
           if (this.qty) {
             Gfx.box(ctx, 640, 390, 260, 110, { fill: '#fff0c8' });
             Gfx.text(ctx, 'How many?', 664, 426, { size: 22, color: Gfx.C.inkSoft });
-            Gfx.text(ctx, `◀ ${this.qty} ▶   = ${it.price * this.qty}`, 664, 470, { size: 26, font: Gfx.BOLD });
+            Gfx.text(ctx, '◀', 674, 472, { size: 26, font: Gfx.BOLD, align: 'center' });
+            Gfx.text(ctx, String(this.qty), 716, 472, { size: 28, font: Gfx.BOLD, align: 'center' });
+            Gfx.text(ctx, '▶', 758, 472, { size: 26, font: Gfx.BOLD, align: 'center' });
+            Gfx.text(ctx, '= ' + it.price * this.qty, 790, 472, { size: 26, font: Gfx.BOLD });
+            if (Input.isTouchUI()) {
+              Gfx.box(ctx, 640, 510, 260, 56, { fill: '#e6ffe0' });
+              Gfx.text(ctx, 'BUY', 770, 548, { size: 28, font: Gfx.BOLD, align: 'center', color: '#3f9a4e' });
+            }
           }
           if (this.bought > 0) { Gfx.box(ctx, 640, 390, 260, 60, { fill: '#e6ffe0' }); Gfx.text(ctx, 'Thank you!', 770, 428, { size: 26, font: Gfx.BOLD, align: 'center', color: '#3f9a4e' }); }
         },

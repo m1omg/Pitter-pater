@@ -41,7 +41,31 @@ const fs = require('fs');
         if (s.until) { try { if (await page.evaluate(s.until)) break; } catch (e) { /* ignore */ } }
       }
     }
+    if (s.tapspamAt) {
+      // like tapspam, but the position (game coordinates) is re-computed in the page before every tap
+      const end = Date.now() + (s.ms || 3000);
+      while (Date.now() < end) {
+        let p = null;
+        try { p = await page.evaluate(`(() => { const g = (${s.tapspamAt}); const r = Game.canvas.getBoundingClientRect(); return [r.left + g[0] * r.width / Game.W, r.top + g[1] * r.height / Game.H]; })()`); } catch (e) { /* ignore */ }
+        if (p) { await touch('touchStart', [p]); await sleep(40); await touch('touchEnd', []); }
+        await sleep(s.every || 150);
+        if (s.until) { try { if (await page.evaluate(s.until)) break; } catch (e) { /* ignore */ } }
+      }
+    }
     if (s.tap) { await touch('touchStart', [s.tap]); await sleep(60); await touch('touchEnd', []); }
+    if (s.waitUntil) {
+      const end = Date.now() + (s.ms || 10000);
+      let ok = false;
+      while (Date.now() < end) { try { if (await page.evaluate(s.waitUntil)) { ok = true; break; } } catch (e) { /* ignore */ } await sleep(50); }
+      if (!ok) logs.push('[timeout] ' + s.waitUntil);
+    }
+    if (s.tapAt) {
+      // tap at game coordinates (960x720) computed in the page, e.g. "[480, 508]"
+      let p = null;
+      try { p = await page.evaluate(`(() => { const g = (${s.tapAt}); const r = Game.canvas.getBoundingClientRect(); return [r.left + g[0] * r.width / Game.W, r.top + g[1] * r.height / Game.H]; })()`); }
+      catch (e) { logs.push('[tapAt error] ' + s.tapAt + ': ' + e.message); }
+      if (p) { await touch('touchStart', [p]); await sleep(60); await touch('touchEnd', []); }
+    }
     if (s.tap2) { const [x, y] = s.tap2; await touch('touchStart', [[x, y], [x + 80, y]]); await sleep(90); await touch('touchEnd', []); }
     if (s.swipe) {
       const [x0, y0, x1, y1] = s.swipe;

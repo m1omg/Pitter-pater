@@ -138,8 +138,12 @@ const Input = {
       }
       return;
     }
-    if (!Array.from(e.changedTouches).some((t) => t.identifier === s.id)) return;
-    if (!cancelled && !s.moved && now - s.t0 < 400) this.tap('ok');
+    const t = Array.from(e.changedTouches).find((tt) => tt.identifier === s.id);
+    if (!t) return;
+    if (!cancelled && !s.moved && now - s.t0 < 400) {
+      this._tapPending = [t.clientX, t.clientY];   // menus can hit-test this position
+      this.tap('ok');                                // everywhere else a tap is simply Z
+    }
     this.releaseDir();
     s.id = null;
   },
@@ -147,6 +151,57 @@ const Input = {
   tap(a) {
     this._pressedQueue.add(a);
     this._anyQueued = true;
+  },
+
+  // tap position in game coordinates (960x720), or null
+  toGame(cx, cy) {
+    const c = window.Game && Game.canvas;
+    if (!c) return null;
+    const r = c.getBoundingClientRect();
+    if (!r.width || !r.height) return null;
+    return { x: ((cx - r.left) / r.width) * Game.W, y: ((cy - r.top) / r.height) * Game.H };
+  },
+
+  // A menu takes this frame's tap (if any); the tap then no longer counts as a plain Z press.
+  takeTap() {
+    const t = this.tapPos;
+    if (t) { this.tapPos = null; delete this.pressed.ok; }
+    return t;
+  },
+
+  // index of the option under point p (hits: [{ i, x, y, w, h }]; overlapping boxes go to the nearest centre), or -1
+  hitIndex(hits, p) {
+    if (!hits || !p) return -1;
+    let best = -1, bd = Infinity;
+    for (const h of hits) {
+      if (p.x < h.x || p.x > h.x + h.w || p.y < h.y || p.y > h.y + h.h) continue;
+      const d = Math.hypot(p.x - (h.x + h.w / 2), p.y - (h.y + h.h / 2));
+      if (d < bd) { bd = d; best = h.i; }
+    }
+    return best;
+  },
+
+  // hit boxes for a column of n evenly spaced rows (the first row showing entry `first`)
+  rowHits(n, x, y, w, pitch, first = 0) {
+    const out = [];
+    for (let j = 0; j < n; j++) out.push({ i: first + j, x, y: y + j * pitch, w, h: pitch });
+    return out;
+  },
+
+  // Tap-to-select for menus: a tap on an option moves the cursor there and confirms it (as if Z was pressed).
+  // With look = true (lists that describe the highlighted entry) the first tap only highlights it and
+  // a tap on the highlighted entry confirms. Taps that miss every option do nothing.
+  // Returns true when the tap is used up and the menu should skip the rest of its input this frame.
+  tapSelect(o, hits, look, key = 'index') {
+    const tap = this.takeTap();
+    if (!tap) return false;
+    const i = this.hitIndex(hits, tap);
+    if (i < 0) return true;
+    const moved = i !== o[key];
+    o[key] = i;
+    if (moved && look) { if (window.Sound) Sound.sfx('sfx_cursor', { volume: 0.5 }); return true; }
+    this.pressed.ok = true;
+    return false;
   },
 
   setDir(d) {
@@ -224,6 +279,8 @@ const Input = {
     this.pollPad();
     this.anyKeyThisFrame = !!this._anyQueued;
     this._anyQueued = false;
+    this.tapPos = null;
+    if (this._tapPending) { this.tapPos = this.toGame(this._tapPending[0], this._tapPending[1]); this._tapPending = null; }
     // touch: run only when a swipe is held far out for a moment (a quick flick is always one step)
     if (this.ts.dir) this.touch.run = (this.ts.dist || 0) >= this.RUN_DIST && performance.now() - this.ts.dirSince > 220;
     const actions = ['up', 'down', 'left', 'right', 'ok', 'cancel', 'run', 'menu'];
@@ -236,7 +293,7 @@ const Input = {
       this.heldFrames[a] = h ? (this.heldFrames[a] || 0) + 1 : 0;
     }
     this._pressedQueue.clear();
-    if (!this.enabled) { this.pressed = {}; }
+    if (!this.enabled) { this.pressed = {}; this.tapPos = null; }
   },
 
   isPressed(a) { return !!this.pressed[a]; },
@@ -248,7 +305,7 @@ const Input = {
     return this.enabled && f > 18 && (f - 18) % 5 === 0;
   },
   consume(a) { delete this.pressed[a]; },
-  clear() { this.pressed = {}; this._pressedQueue.clear(); },
+  clear() { this.pressed = {}; this._pressedQueue.clear(); this.tapPos = null; this._tapPending = null; },
   // direction currently held (last pressed wins, like RPG Maker 4-dir)
   dir4() {
     const order = ['up', 'down', 'left', 'right'];
