@@ -1,0 +1,1 @@
+[{"wait":2000},{"eval":"GameOver.show(); 1"},{"wait":2500},{"shot":"gameover.png"}]

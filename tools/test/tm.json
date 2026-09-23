@@ -1,0 +1,20 @@
+[
+ {"wait": 1500},
+ {"key": "KeyX"}, {"wait": 500},
+ {"shot": "m1_pause.png"},
+ {"key": "KeyZ"}, {"wait": 400},
+ {"shot": "m2_items.png"},
+ {"key": "KeyZ"}, {"wait": 300},
+ {"shot": "m3_items_use.png"},
+ {"key": "KeyX"}, {"wait": 200}, {"key": "KeyX"}, {"wait": 200},
+ {"key": "ArrowDown"}, {"key": "ArrowDown"}, {"wait": 200}, {"key": "KeyZ"}, {"wait": 300}, {"key": "KeyZ"}, {"wait": 300},
+ {"shot": "m4_stickers.png"},
+ {"key": "KeyX"}, {"wait": 200}, {"key": "KeyX"}, {"wait": 200}, {"key": "KeyX"}, {"wait": 300},
+ {"eval": "Story.beforeSave(); State.save(2)"},
+ {"eval": "({peek: !!State.peek(2), map: State.peek(2).map})"},
+ {"eval": "Shop.open(['cookie','toast','gummy','warm_milk','lemonade','bubbles','balloon','cushion','duck','st_bandaid'], {title: \"GUMBALL'S\"}); 1"},
+ {"wait": 500}, {"key": "KeyZ"}, {"wait": 300}, {"key": "ArrowUp"}, {"wait": 200},
+ {"shot": "m5_shop.png"},
+ {"key": "KeyZ"}, {"wait": 300}, {"key": "KeyX"}, {"wait": 300},
+ {"eval": "({marbles: State.d.marbles, cookies: State.itemCount('cookie'), errs: Game.errors})"}
+]

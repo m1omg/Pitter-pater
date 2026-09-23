@@ -1,0 +1,598 @@
+{
+ "bg_attic": {
+  "file": "bg/bg_attic.jpg"
+ },
+ "bg_carpet": {
+  "file": "bg/bg_carpet.jpg"
+ },
+ "bg_crumb": {
+  "file": "bg/bg_crumb.jpg"
+ },
+ "bg_fort": {
+  "file": "bg/bg_fort.jpg"
+ },
+ "bg_keep": {
+  "file": "bg/bg_keep.jpg"
+ },
+ "bg_queen": {
+  "file": "bg/bg_keep.jpg"
+ },
+ "bg_static": {
+  "file": "bg/bg_static.jpg"
+ },
+ "bg_toaster": {
+  "file": "bg/bg_crumb.jpg"
+ },
+ "cg_beach": {
+  "file": "cg/cg_beach.jpg"
+ },
+ "cg_dad": {
+  "file": "cg/cg_dad.jpg"
+ },
+ "cg_ending": {
+  "file": "cg/cg_rainbow.jpg"
+ },
+ "cg_gameover": {
+  "file": "cg/cg_gameover.png"
+ },
+ "cg_hallway": {
+  "file": "cg/cg_hallway.jpg"
+ },
+ "cg_queen": {
+  "file": "cg/cg_queen.jpg"
+ },
+ "cg_rainbow": {
+  "file": "cg/cg_rainbow.jpg"
+ },
+ "cg_title": {
+  "file": "cg/cg_title.jpg"
+ },
+ "chr_biscuit": {
+  "dh": null,
+  "file": "chars/chr_biscuit.png",
+  "layout": "dirs3"
+ },
+ "chr_biscuit_real": {
+  "dh": null,
+  "file": "chars/chr_biscuit_real.png",
+  "layout": "dirs3"
+ },
+ "chr_mom": {
+  "dh": null,
+  "file": "chars/chr_mom.png",
+  "layout": "dirs3"
+ },
+ "chr_momo": {
+  "dh": null,
+  "file": "chars/chr_momo.png",
+  "layout": "dirs3"
+ },
+ "chr_pim": {
+  "dh": null,
+  "file": "chars/chr_pim.png",
+  "layout": "dirs3"
+ },
+ "chr_waffles": {
+  "dh": null,
+  "file": "chars/chr_waffles.png",
+  "layout": "dirs3"
+ },
+ "chr_waffles_real": {
+  "dh": null,
+  "file": "chars/chr_waffles_real.png",
+  "layout": "dirs3"
+ },
+ "en_coat": {
+  "file": "enemies/en_coat.png"
+ },
+ "en_coin": {
+  "file": "enemies/en_coin.png"
+ },
+ "en_drizzlet": {
+  "file": "enemies/en_drizzlet.png"
+ },
+ "en_dustbunny": {
+  "file": "enemies/en_dustbunny.png"
+ },
+ "en_forkling": {
+  "file": "enemies/en_forkling.png"
+ },
+ "en_grumbles": {
+  "file": "enemies/en_grumbles.png"
+ },
+ "en_laundry": {
+  "file": "enemies/en_laundry.png"
+ },
+ "en_lemon": {
+  "file": "enemies/en_lemon.png"
+ },
+ "en_lintmoth": {
+  "file": "enemies/en_lintmoth.png"
+ },
+ "en_rainqueen": {
+  "file": "enemies/en_rainqueen.png"
+ },
+ "en_rainwisp": {
+  "file": "enemies/en_rainwisp.png"
+ },
+ "en_remote": {
+  "file": "enemies/en_remote.png"
+ },
+ "en_sock": {
+  "file": "enemies/en_sock.png"
+ },
+ "en_staticghost": {
+  "file": "enemies/en_staticghost.png"
+ },
+ "en_sugarmite": {
+  "file": "enemies/en_sugarmite.png"
+ },
+ "en_thestatic": {
+  "file": "enemies/en_thestatic.png"
+ },
+ "en_thunderhead": {
+  "file": "enemies/en_thunderhead.png"
+ },
+ "en_tissue": {
+  "file": "enemies/en_tissue.png"
+ },
+ "en_toast": {
+  "file": "enemies/en_toast.png"
+ },
+ "en_umbrellabat": {
+  "file": "enemies/en_umbrellabat.png"
+ },
+ "face_biscuit_cheery": {
+  "file": "faces/face_biscuit_cheery.png"
+ },
+ "face_biscuit_down": {
+  "file": "faces/face_biscuit_down.png"
+ },
+ "face_biscuit_gloomy": {
+  "file": "faces/face_biscuit_gloomy.png"
+ },
+ "face_biscuit_huffy": {
+  "file": "faces/face_biscuit_huffy.png"
+ },
+ "face_biscuit_hurt": {
+  "file": "faces/face_biscuit_hurt.png"
+ },
+ "face_biscuit_neutral": {
+  "file": "faces/face_biscuit_neutral.png"
+ },
+ "face_dad_neutral": {
+  "file": "faces/face_dad_neutral.png"
+ },
+ "face_mom_cry": {
+  "file": "faces/face_mom_cry.png"
+ },
+ "face_mom_neutral": {
+  "file": "faces/face_mom_neutral.png"
+ },
+ "face_mom_sad": {
+  "file": "faces/face_mom_sad.png"
+ },
+ "face_mom_smile": {
+  "file": "faces/face_mom_smile.png"
+ },
+ "face_mom_surprised": {
+  "file": "faces/face_mom_surprised.png"
+ },
+ "face_mom_warm": {
+  "file": "faces/face_mom_warm.png"
+ },
+ "face_momo_cheery": {
+  "file": "faces/face_momo_cheery.png"
+ },
+ "face_momo_down": {
+  "file": "faces/face_momo_down.png"
+ },
+ "face_momo_gloomy": {
+  "file": "faces/face_momo_gloomy.png"
+ },
+ "face_momo_huffy": {
+  "file": "faces/face_momo_huffy.png"
+ },
+ "face_momo_hurt": {
+  "file": "faces/face_momo_hurt.png"
+ },
+ "face_momo_neutral": {
+  "file": "faces/face_momo_neutral.png"
+ },
+ "face_pim_cheery": {
+  "file": "faces/face_pim_cheery.png"
+ },
+ "face_pim_cry": {
+  "file": "faces/face_pim_cry.png"
+ },
+ "face_pim_down": {
+  "file": "faces/face_pim_down.png"
+ },
+ "face_pim_forced": {
+  "file": "faces/face_pim_forced.png"
+ },
+ "face_pim_huffy": {
+  "file": "faces/face_pim_huffy.png"
+ },
+ "face_pim_hurt": {
+  "file": "faces/face_pim_hurt.png"
+ },
+ "face_pim_neutral": {
+  "file": "faces/face_pim_neutral.png"
+ },
+ "face_pim_surprised": {
+  "file": "faces/face_pim_surprised.png"
+ },
+ "face_queen_neutral": {
+  "file": "faces/face_queen_neutral.png"
+ },
+ "face_queen_sad": {
+  "file": "faces/face_queen_sad.png"
+ },
+ "face_queen_soft": {
+  "file": "faces/face_queen_soft.png"
+ },
+ "face_waffles_cheery": {
+  "file": "faces/face_waffles_cheery.png"
+ },
+ "face_waffles_down": {
+  "file": "faces/face_waffles_down.png"
+ },
+ "face_waffles_gloomy": {
+  "file": "faces/face_waffles_gloomy.png"
+ },
+ "face_waffles_huffy": {
+  "file": "faces/face_waffles_huffy.png"
+ },
+ "face_waffles_hurt": {
+  "file": "faces/face_waffles_hurt.png"
+ },
+ "face_waffles_neutral": {
+  "file": "faces/face_waffles_neutral.png"
+ },
+ "npc_ant": {
+  "file": "npcs/npc_ant.png"
+ },
+ "npc_bunny": {
+  "file": "npcs/npc_bunny.png"
+ },
+ "npc_coat": {
+  "file": "enemies/en_coat.png"
+ },
+ "npc_egg": {
+  "file": "npcs/npc_egg.png"
+ },
+ "npc_elder": {
+  "file": "npcs/npc_elder.png"
+ },
+ "npc_gumball": {
+  "file": "npcs/npc_gumball.png"
+ },
+ "npc_hermit": {
+  "file": "npcs/npc_hermit.png"
+ },
+ "npc_ladle": {
+  "file": "npcs/npc_ladle.png"
+ },
+ "npc_lamp": {
+  "file": "npcs/npc_lamp.png"
+ },
+ "npc_muffin": {
+  "file": "npcs/npc_muffin.png"
+ },
+ "npc_okafor": {
+  "file": "npcs/npc_okafor.png"
+ },
+ "npc_pepper": {
+  "file": "npcs/npc_pepper.png"
+ },
+ "npc_remoteking": {
+  "file": "npcs/npc_remoteking.png"
+ },
+ "npc_salt": {
+  "file": "npcs/npc_salt.png"
+ },
+ "npc_sockpuppet": {
+  "file": "npcs/npc_sockpuppet.png"
+ },
+ "npc_sprinkle": {
+  "file": "npcs/npc_sprinkle.png"
+ },
+ "npc_sun": {
+  "file": "npcs/npc_sun.png"
+ },
+ "npc_teapot": {
+  "file": "npcs/npc_teapot.png"
+ },
+ "p_antenna_tree": {
+  "file": "props/p_antenna_tree.png"
+ },
+ "p_attic_ladder": {
+  "file": "props/p_attic_ladder.png"
+ },
+ "p_bed_pim": {
+  "file": "props/p_bed_pim.png"
+ },
+ "p_blanket_tent": {
+  "file": "props/p_blanket_tent.png"
+ },
+ "p_book_stack": {
+  "file": "props/p_book_stack.png"
+ },
+ "p_books_tower": {
+  "file": "props/p_books_tower.png"
+ },
+ "p_bookshelf": {
+  "file": "props/p_bookshelf.png"
+ },
+ "p_box": {
+  "file": "props/p_box.png"
+ },
+ "p_box_stack": {
+  "file": "props/p_box_stack.png"
+ },
+ "p_bread": {
+  "file": "props/p_bread.png"
+ },
+ "p_bush": {
+  "file": "props/p_bush.png"
+ },
+ "p_butter": {
+  "file": "props/p_butter.png"
+ },
+ "p_candle_light": {
+  "file": "props/p_candle_light.png"
+ },
+ "p_cardboard_castle": {
+  "file": "props/p_cardboard_castle.png"
+ },
+ "p_cereal_box": {
+  "file": "props/p_cereal_box.png"
+ },
+ "p_chair": {
+  "file": "props/p_chair.png"
+ },
+ "p_cloud_bush": {
+  "file": "props/p_cloud_bush.png"
+ },
+ "p_cloud_pillar": {
+  "file": "props/p_cloud_pillar.png"
+ },
+ "p_coat_rack": {
+  "file": "props/p_coat_rack.png"
+ },
+ "p_coffee_table": {
+  "file": "props/p_coffee_table.png"
+ },
+ "p_coin_big": {
+  "file": "props/p_coin_big.png"
+ },
+ "p_couch": {
+  "file": "props/p_couch.png"
+ },
+ "p_counter": {
+  "file": "props/p_counter.png"
+ },
+ "p_crayon": {
+  "file": "props/p_crayon.png"
+ },
+ "p_curtains": {
+  "file": "props/p_curtains.png"
+ },
+ "p_cushion_hill": {
+  "file": "props/p_cushion_hill.png"
+ },
+ "p_dad_box": {
+  "file": "props/p_dad_box.png"
+ },
+ "p_desk": {
+  "file": "props/p_desk.png"
+ },
+ "p_door": {
+  "file": "props/p_door.png"
+ },
+ "p_door_mom": {
+  "file": "props/p_door_mom.png"
+ },
+ "p_drawings": {
+  "file": "props/p_drawings.png"
+ },
+ "p_dresser": {
+  "file": "props/p_dresser.png"
+ },
+ "p_dust_hut": {
+  "file": "props/p_dust_hut.png"
+ },
+ "p_fence": {
+  "file": "props/p_fence.png"
+ },
+ "p_floor_lamp": {
+  "file": "props/p_floor_lamp.png"
+ },
+ "p_flowerbed": {
+  "file": "props/p_flowerbed.png"
+ },
+ "p_fork_fence": {
+  "file": "props/p_fork_fence.png"
+ },
+ "p_fridge": {
+  "file": "props/p_fridge.png"
+ },
+ "p_front_door": {
+  "file": "props/p_front_door.png"
+ },
+ "p_house_front": {
+  "file": "props/p_house_front.png"
+ },
+ "p_jam_jar": {
+  "file": "props/p_jam_jar.png"
+ },
+ "p_kitchen_table": {
+  "file": "props/p_kitchen_table.png"
+ },
+ "p_lamp_tree": {
+  "file": "props/p_lamp_tree.png"
+ },
+ "p_lantern": {
+  "file": "props/p_lantern.png"
+ },
+ "p_laundry_block": {
+  "file": "props/p_laundry_block.png"
+ },
+ "p_laundry_pile": {
+  "file": "props/p_laundry_pile.png"
+ },
+ "p_lint_tree": {
+  "file": "props/p_lint_tree.png"
+ },
+ "p_mailbox": {
+  "file": "props/p_mailbox.png"
+ },
+ "p_marble": {
+  "file": "props/p_marble.png"
+ },
+ "p_milk_carton": {
+  "file": "props/p_milk_carton.png"
+ },
+ "p_mirror": {
+  "file": "props/p_mirror.png"
+ },
+ "p_mom_bed": {
+  "file": "props/p_mom_bed.png"
+ },
+ "p_momo_plush": {
+  "file": "props/p_momo_plush.png"
+ },
+ "p_moon_light": {
+  "file": "props/p_moon_light.png"
+ },
+ "p_music_box": {
+  "file": "props/p_music_box.png"
+ },
+ "p_nightstand": {
+  "file": "props/p_nightstand.png"
+ },
+ "p_pepper": {
+  "file": "props/p_pepper.png"
+ },
+ "p_pet_bowls": {
+  "file": "props/p_pet_bowls.png"
+ },
+ "p_phone_table": {
+  "file": "props/p_phone_table.png"
+ },
+ "p_photo_big": {
+  "file": "props/p_photo_big.png"
+ },
+ "p_photo_frames": {
+  "file": "props/p_photo_frames.png"
+ },
+ "p_photo_stand": {
+  "file": "props/p_photo_stand.png"
+ },
+ "p_pillow": {
+  "file": "props/p_pillow.png"
+ },
+ "p_pillow_pile": {
+  "file": "props/p_pillow_pile.png"
+ },
+ "p_plant": {
+  "file": "props/p_plant.png"
+ },
+ "p_plant_pot": {
+  "file": "props/p_plant_pot.png"
+ },
+ "p_plush_bear": {
+  "file": "props/p_plush_bear.png"
+ },
+ "p_queen_throne": {
+  "file": "props/p_queen_throne.png"
+ },
+ "p_rain_window": {
+  "file": "props/p_rain_window.png"
+ },
+ "p_raindrop_door": {
+  "file": "props/p_raindrop_door.png"
+ },
+ "p_remote_tower": {
+  "file": "props/p_remote_tower.png"
+ },
+ "p_rocking_horse": {
+  "file": "props/p_rocking_horse.png"
+ },
+ "p_rug_long": {
+  "file": "props/p_rug_long.png"
+ },
+ "p_rug_round": {
+  "file": "props/p_rug_round.png"
+ },
+ "p_salt": {
+  "file": "props/p_salt.png"
+ },
+ "p_sheet_furniture": {
+  "file": "props/p_sheet_furniture.png"
+ },
+ "p_side_plant": {
+  "file": "props/p_side_plant.png"
+ },
+ "p_stairs": {
+  "file": "props/p_stairs.png"
+ },
+ "p_stairs_up": {
+  "file": "props/p_stairs_up.png"
+ },
+ "p_stove": {
+  "file": "props/p_stove.png"
+ },
+ "p_sugar_bowl": {
+  "file": "props/p_sugar_bowl.png"
+ },
+ "p_sugar_cube": {
+  "file": "props/p_sugar_cube.png"
+ },
+ "p_teacup_house": {
+  "file": "props/p_teacup_house.png"
+ },
+ "p_teacup_house2": {
+  "file": "props/p_teacup_house2.png"
+ },
+ "p_teapot_house": {
+  "file": "props/p_teapot_house.png"
+ },
+ "p_tissue_box": {
+  "file": "props/p_tissue_box.png"
+ },
+ "p_toaster_big": {
+  "file": "enemies/en_grumbles.png"
+ },
+ "p_toy_blocks": {
+  "file": "props/p_toy_blocks.png"
+ },
+ "p_toybox": {
+  "file": "props/p_toybox.png"
+ },
+ "p_tree": {
+  "file": "props/p_tree.png"
+ },
+ "p_trunk": {
+  "file": "props/p_trunk.png"
+ },
+ "p_tv": {
+  "file": "props/p_tv.png"
+ },
+ "p_tv_giant": {
+  "file": "enemies/en_thestatic.png"
+ },
+ "p_tv_small": {
+  "file": "props/p_tv_small.png"
+ },
+ "p_umbrella_stand": {
+  "file": "props/p_umbrella_stand.png"
+ },
+ "p_washer": {
+  "file": "props/p_washer.png"
+ },
+ "p_window": {
+  "file": "props/p_window.png"
+ }
+}

@@ -1,0 +1,21 @@
+[
+ {"wait": 2600},
+ {"shot": "05_battle_start.png"},
+ {"key": "KeyZ"}, {"wait": 1200},
+ {"shot": "06_battle_partycmd.png"},
+ {"key": "KeyZ"}, {"wait": 400},
+ {"shot": "07_battle_actorcmd.png"},
+ {"key": "ArrowDown"}, {"wait": 200}, {"key": "KeyZ"}, {"wait": 400},
+ {"shot": "08_battle_skills.png"},
+ {"key": "KeyX"}, {"wait": 300}, {"key": "ArrowUp"}, {"wait": 200}, {"key": "KeyZ"}, {"wait": 300},
+ {"shot": "09_battle_target.png"},
+ {"key": "KeyZ"}, {"wait": 300},
+ {"key": "KeyZ"}, {"wait": 300}, {"key": "KeyZ"}, {"wait": 300},
+ {"key": "KeyZ"}, {"wait": 300}, {"key": "KeyZ"}, {"wait": 300},
+ {"key": "KeyZ"}, {"wait": 300}, {"key": "KeyZ"}, {"wait": 300},
+ {"wait": 1500},
+ {"shot": "10_battle_exec.png"},
+ {"wait": 4000},
+ {"shot": "11_battle_later.png"},
+ {"eval": "Game.errors"}
+]

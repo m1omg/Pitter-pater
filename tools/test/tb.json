@@ -1,0 +1,5 @@
+[
+ {"wait": 1200},
+ {"spam": "KeyZ", "ms": 240000, "every": 80, "until": "!Battle.current || (Game.overlays.length && Game.overlays[0].index !== undefined && Game.overlays[0].t > 60)"},
+ {"eval": "({battleOver: !Battle.current, gameOver: !!(Game.overlays.length && Game.overlays[0].index !== undefined), turn: window._lastTurn, party: State.d.party.map(id => id + ':' + State.actor(id).hp + '/' + State.stats(id).maxhp), errs: Game.errors})"}
+]

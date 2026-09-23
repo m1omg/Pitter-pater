@@ -1,0 +1,7 @@
+[
+ {"wait": 1500},
+ {"hold": "ArrowUp", "ms": 400},
+ {"spam": "KeyZ", "ms": 90000, "every": 90, "until": "Game.scene && Game.scene.mapId==='pim_room' && !Events.running && Game.overlays.length===0"},
+ {"eval": "({map: Game.scene && Game.scene.mapId, ch: State.d.chapter, flags: Object.keys(State.d.flags), tasks: State.d.tasks, items: State.d.keyItems, errs: Game.errors})"},
+ {"shot": "p3_morning1.png"}
+]

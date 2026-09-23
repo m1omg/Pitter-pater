@@ -1,0 +1,8 @@
+[
+ {"wait": 1500},
+ {"spam": "KeyZ", "ms": 8000, "until": "!Events.running && Game.overlays.length===0"},
+ {"hold": "ArrowDown", "ms": 600},
+ {"wait": 300},
+ {"shot": "h1_hud.png"},
+ {"eval": "Game.errors"}
+]

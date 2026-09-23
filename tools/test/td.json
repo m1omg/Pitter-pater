@@ -1,0 +1,1 @@
+[{"wait":1500},{"spam":"KeyZ","ms":6000,"until":"!Events.running && Game.overlays.length===0"},{"shot":"d1_crumb.png"},{"eval":"Game.errors"}]

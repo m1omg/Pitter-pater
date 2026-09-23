@@ -1,0 +1,4 @@
+[
+ {"wait": 4000},
+ {"eval": "(async()=>{const ids=Object.keys(AUDIO_MANIFEST); const res={}; for (const id of ids){ const b = await Sound.load(id); res[id]= b ? +b.duration.toFixed(2) : null;} return {n: ids.length, missing: ids.filter(i=>!res[i]), sample: Object.fromEntries(Object.entries(res).slice(0,40))};})()"}
+]

@@ -1,0 +1,1 @@
+[{"wait":2000},{"spam":"KeyZ","ms":5000,"until":"!Events.running && Game.overlays.length===0"},{"hold":"ArrowRight","ms":500},{"shot":"fin_keep_2.png"},{"eval":"Game.errors"}]

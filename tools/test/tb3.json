@@ -1,0 +1,1 @@
+[{"wait":3500},{"spam":"KeyZ","ms":2500,"until":"Battle.current && Battle.current.ui"},{"wait":300},{"shot":"art_battle3.png"}]

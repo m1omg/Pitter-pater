@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PITTER-PATTER</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 6c14 0 26 10 26 24H6C6 16 18 6 32 6z' fill='%23e0483e' stroke='%233a2a2a' stroke-width='3'/%3E%3Cpath d='M32 30v22c0 5-8 5-8 0' fill='none' stroke='%233a2a2a' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #16131a; overflow: hidden; }
+  body { display: flex; align-items: center; justify-content: center; }
+  #game { display: block; image-rendering: auto; outline: none; box-shadow: 0 0 60px rgba(0,0,0,0.6); }
+  #boot { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+          color: #d9d2c3; font: 20px sans-serif; letter-spacing: 2px; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="boot">loading…</div>
+<canvas id="game" tabindex="0"></canvas>
+
+<!-- engine -->
+<script src="js/fonts_data.js"></script>
+<script src="js/core/util.js"></script>
+<script src="js/core/input.js"></script>
+<script src="js/core/audio.js"></script>
+<script src="js/core/gfx.js"></script>
+<script src="js/core/assets.js"></script>
+<script src="js/core/engine.js"></script>
+
+<!-- asset manifests (generated) -->
+<script src="img/manifest.js"></script>
+<script src="audio/manifest.js" onerror="window.AUDIO_MANIFEST = window.AUDIO_MANIFEST || {};"></script>
+
+<!-- game systems -->
+<script src="js/game/database.js"></script>
+<script src="js/game/state.js"></script>
+<script src="js/game/message.js"></script>
+<script src="js/game/sprites.js"></script>
+<script src="js/game/materials.js"></script>
+<script src="js/game/map.js"></script>
+<script src="js/game/events.js"></script>
+<script src="js/game/menu.js"></script>
+<script src="js/game/battle.js"></script>
+<script src="js/game/title.js"></script>
+<script src="js/game/cutscene.js"></script>
+
+<!-- content -->
+<script src="js/content/characters.js"></script>
+<script src="js/content/props.js"></script>
+<script src="js/content/story.js"></script>
+<script src="js/content/balance.js"></script>
+<script src="js/content/maps_home.js"></script>
+<script src="js/content/maps_fort.js"></script>
+<script src="js/content/maps_crumb.js"></script>
+<script src="js/content/maps_carpet.js"></script>
+<script src="js/content/maps_attic.js"></script>
+<script src="js/content/maps_keep.js"></script>
+<script src="js/content/decor.js"></script>
+<script src="js/content/minigames.js"></script>
+<script src="js/content/gallery.js"></script>
+
+<script src="js/main.js"></script>
+</body>
+</html>

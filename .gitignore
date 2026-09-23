@@ -1,0 +1,11 @@
+# dependencies / caches
+node_modules/
+__pycache__/
+*.pyc
+# local-only helpers and intermediates
+PITTER-PATTER.desktop
+tools/art/logs/
+tools/art/preview/
+tools/audio/out/
+tools/test/shots*/
+*.log

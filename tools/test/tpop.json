@@ -1,0 +1,13 @@
+[
+ {"wait": 1500},
+ {"spam": "KeyZ", "ms": 5000, "until": "!Events.running && Game.overlays.length===0"},
+ {"eval": "E.setPos('player', 20, 13, 'right'); Game.scene.runEvent(Game.scene.event('popcorn_bunny'), true); 1"},
+ {"spam": "KeyZ", "ms": 4000, "until": "Game.overlays.some(o=>o.time!==undefined)"},
+ {"wait": 2500},
+ {"hold": "ArrowLeft", "ms": 800}, {"hold": "ArrowRight", "ms": 1500},
+ {"shot": "pop1.png"},
+ {"eval": "(()=>{const g=Game.overlays.find(o=>o.time!==undefined); g.time=5; return g.score;})()"},
+ {"wait": 1500},
+ {"spam": "KeyZ", "ms": 10000, "until": "!Events.running && Game.overlays.length===0"},
+ {"eval": "({best: State.v('popcorn_best'), marbles: State.d.marbles, errs: Game.errors})"}
+]

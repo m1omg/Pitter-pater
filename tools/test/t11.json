@@ -1,0 +1,9 @@
+[
+ {"wait": 1500},
+ {"spam": "KeyZ", "ms": 8000, "until": "Game.scene.chaser && !Events.running && Game.overlays.length===0"},
+ {"eval": "({ev: Events.running, ov: Game.overlays.length, c: [Game.scene.chaser.x, Game.scene.chaser.y, Game.scene.chaser.moving, Game.scene.chaser.stunT], caught: Game.scene.caught})"},
+ {"wait": 500},
+ {"eval": "({ev: Events.running, c: [Game.scene.chaser.x, Game.scene.chaser.y, Game.scene.chaser.moving], p:[Game.scene.player.x,Game.scene.player.y]})"},
+ {"wait": 500},
+ {"eval": "({ev: Events.running, c: [Game.scene.chaser.x, Game.scene.chaser.y, Game.scene.chaser.moving], p:[Game.scene.player.x,Game.scene.player.y], caught: Game.scene.caught})"}
+]

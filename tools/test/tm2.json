@@ -1,0 +1,17 @@
+[
+ {"wait": 1500},
+ {"key": "KeyX"}, {"wait": 500},
+ {"shot": "m1_pause.png"},
+ {"key": "KeyZ"}, {"wait": 400},
+ {"shot": "m2_items.png"},
+ {"key": "KeyX"}, {"wait": 200},
+ {"key": "ArrowDown"}, {"wait": 150}, {"key": "KeyZ"}, {"wait": 300}, {"key": "KeyZ"}, {"wait": 300},
+ {"shot": "m3_skills.png"},
+ {"key": "KeyX"}, {"wait": 200}, {"key": "KeyX"}, {"wait": 200},
+ {"key": "ArrowDown"}, {"wait": 150}, {"key": "KeyZ"}, {"wait": 300},
+ {"shot": "m4_stickers.png"},
+ {"key": "KeyX"}, {"wait": 200},
+ {"key": "ArrowDown"}, {"wait": 150}, {"key": "KeyZ"}, {"wait": 300},
+ {"shot": "m5_options.png"},
+ {"eval": "Game.errors"}
+]

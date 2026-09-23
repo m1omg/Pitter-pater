@@ -1,0 +1,6 @@
+[
+ {"wait": 1500},
+ {"eval": "(()=>{const c=document.createElement('canvas');c.width=600;c.height=200;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,600,200);g.font='40px \"PatrickHand\"';g.fillStyle='#000';g.fillText('DRIZZLET Iiil',10,60);let x=10;for(const ch of 'DRIZZLET Iiil'){g.fillText(ch,x,130);x+=g.measureText(ch).width;} document.body.innerHTML='';document.body.appendChild(c); return ['I','D','R','Z'].map(ch=>g.measureText(ch).width);})()"},
+ {"wait": 300},
+ {"shot": "12_glyphs.png"}
+]

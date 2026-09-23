@@ -1,0 +1,11 @@
+{
+  "chr_pim": {"dh": 84, "preload": true},
+  "chr_biscuit": {"dh": 74, "preload": true},
+  "chr_waffles": {"dh": 78, "preload": true},
+  "chr_momo": {"dh": 62, "preload": true},
+  "chr_mom": {"dh": 104},
+  "chr_biscuit_real": {"dh": 48},
+  "chr_waffles_real": {"dh": 58},
+  "face_pim_neutral": {"preload": true}, "face_pim_cheery": {"preload": true}, "face_pim_forced": {"preload": true},
+  "face_biscuit_neutral": {"preload": true}, "face_waffles_neutral": {"preload": true}, "face_momo_neutral": {"preload": true}
+}

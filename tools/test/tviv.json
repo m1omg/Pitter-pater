@@ -1,0 +1,7 @@
+[
+ {"wait": 2500},
+ {"eval": "({title: document.title, boot: !!document.getElementById('boot'), scene: Game.scene && Game.scene.constructor.name, fonts: document.fonts.size, audio: Sound.ctx && Sound.ctx.state, errors: Game.errors})"},
+ {"key": "KeyZ"}, {"wait": 1500},
+ {"shot": "viv_title.png"},
+ {"eval": "({bgm: Sound.bgm && Sound.bgm.id, errors: Game.errors})"}
+]

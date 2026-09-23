@@ -1,0 +1,23 @@
+[
+ {"wait": 1500},
+ {"hold": "ArrowUp", "ms": 1200},
+ {"spam": "KeyZ", "ms": 150000, "every": 90, "until": "Game.scene && Game.scene.mapId==='pim_room' && !Events.running && Game.overlays.length===0"},
+ {"eval": "({map: Game.scene && Game.scene.mapId, ch: State.d.chapter, tasks: State.d.tasks, items: State.d.keyItems, errs: Game.errors})"},
+ {"eval": "E.transfer('downstairs', 20, 3, 'down')"}, {"wait": 1000},
+ {"spam": "KeyZ", "ms": 6000, "until": "!Events.running && Game.overlays.length===0"},
+ {"eval": "E.setPos('player', 5, 4, 'down'); Game.scene.runEvent(Game.scene.event('mom_kitchen'), true)"},
+ {"spam": "KeyZ", "ms": 40000, "until": "State.flag('want_album') && !Events.running && Game.overlays.length===0"},
+ {"shot": "p7_after_mom.png"},
+ {"eval": "E.setPos('player', 2, 4, 'up'); Game.scene.runEvent(Game.scene.event('drawer'), true)"},
+ {"spam": "KeyZ", "ms": 8000, "until": "!Events.running && Game.overlays.length===0"},
+ {"eval": "E.transfer('hallway', 7, 3, 'up')"}, {"wait": 1500},
+ {"eval": "Game.scene.runEvent(Game.scene.event('hook'), true)"},
+ {"spam": "KeyZ", "ms": 8000, "until": "!Events.running && Game.overlays.length===0"},
+ {"eval": "Game.scene.runEvent(Game.scene.event('ladder'), true)"},
+ {"spam": "KeyZ", "ms": 8000, "until": "Game.scene.mapId==='attic_real' && !Events.running && Game.overlays.length===0"},
+ {"shot": "p8_attic_real.png"},
+ {"eval": "E.setPos('player', 6, 6, 'up'); Game.scene.runEvent(Game.scene.event('dadbox'), true)"},
+ {"spam": "KeyZ", "ms": 40000, "until": "Game.scene && Game.scene.mapId==='attic_1' && !Events.running && Game.overlays.length===0"},
+ {"eval": "({map: Game.scene.mapId, ch: State.d.chapter, party: State.d.party, followers: Game.scene.followers.map(f=>f.id), errs: Game.errors})"},
+ {"shot": "p9_attic1.png"}
+]

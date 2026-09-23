@@ -1,0 +1,8 @@
+[
+ {"wait": 2500},
+ {"eval": "window._logs=[]; const B=Battle.current; const orig=B.log.bind(B); B.log=(t,o)=>{window._logs.push(t); return orig(t,o);}; window.pick=async(i)=>{ for(let k=0;k<200 && !Battle.current.ui;k++) await new Promise(r=>setTimeout(r,30)); const ui=Battle.current.ui; const v = typeof i==='function'? i(ui): i; Battle.current.closeMenu(v); await new Promise(r=>setTimeout(r,60)); return ui.type; }; 1"},
+ {"eval": "(async()=>{ const sk=(ui)=>ui.options.findIndex(o=>o.id==='skill'); const r=[]; r.push(await pick(0)); r.push(await pick(0)); r.push(await pick(0)); r.push(await pick(sk)); r.push(await pick(0)); r.push(await pick(0)); r.push(await pick(sk)); r.push(await pick(0)); r.push(await pick(0)); r.push(await pick(sk)); r.push(await pick(0)); r.push(await pick(0)); return r; })()"},
+ {"spam": "KeyZ", "ms": 30000, "every": 200, "until": "window._logs.some(l=>/OVERWHELMED/.test(l)) || (Battle.current && Battle.current.ui && Battle.current.ui.type==='party')"},
+ {"shot": "mood1.png"},
+ {"eval": "({logs: window._logs, moods: Battle.current ? Battle.current.enemies.map(e=>e.name+':'+e.mood) : null, errs: Game.errors})"}
+]

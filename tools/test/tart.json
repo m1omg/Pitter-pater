@@ -1,0 +1,1 @@
+[{"wait":1500},{"hold":"ArrowLeft","ms":300},{"wait":200},{"shot":"art_pim1.png"},{"hold":"ArrowUp","ms":300},{"wait":300},{"shot":"art_pim2.png"},{"eval":"Game.errors"}]

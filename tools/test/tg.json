@@ -1,0 +1,1 @@
+[{"wait":2000},{"eval":"const s=Game.scene; s.camPan=true; s.camX=0; s.camY=96; 1"},{"wait":300},{"shot":"gal_3a.png"},{"eval":"const s=Game.scene; s.camX=860; s.camY=96; 1"},{"wait":300},{"shot":"gal_3b.png"}]

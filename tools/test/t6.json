@@ -1,0 +1,19 @@
+[
+ {"wait": 1500},
+ {"key": "KeyZ"}, {"wait": 600},
+ {"key": "KeyZ"}, {"wait": 300},
+ {"spam": "KeyZ", "ms": 20000, "until": "Game.scene && Game.scene.mapId==='downstairs' && !Events.running && Game.overlays.length===0"},
+ {"shot": "p1_downstairs.png"},
+ {"eval": "({map: Game.scene.mapId, tasks: State.d.tasks, errs: Game.errors})"},
+ {"eval": "E.transfer('hallway', 16, 3, 'up')"},
+ {"wait": 1500},
+ {"eval": "Game.scene.runEvent(Game.scene.event('mom_door'), true)"},
+ {"spam": "KeyZ", "ms": 12000, "until": "!Events.running && Game.overlays.length===0"},
+ {"eval": "({f: State.d.flags, tasks: State.d.tasks})"},
+ {"eval": "E.transfer('pim_room', 3, 5, 'left')"},
+ {"wait": 1500},
+ {"eval": "Game.scene.runEvent(Game.scene.event('bed'), true)"},
+ {"spam": "KeyZ", "ms": 60000, "until": "Game.scene && Game.scene.mapId==='fort' && State.flag('fort_intro_done') && !Events.running && Game.overlays.length===0"},
+ {"shot": "p2_fort_after_intro.png"},
+ {"eval": "({map: Game.scene.mapId, party: State.d.party, followers: Game.scene.followers.map(f=>f.id), ch: State.d.chapter, lv: State.d.party.map(p=>State.actor(p).level), errs: Game.errors})"}
+]

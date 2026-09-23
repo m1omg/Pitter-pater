@@ -1,0 +1,8 @@
+[
+ {"wait": 1500},
+ {"eval": "validateContent()"},
+ {"shot": "01_title.png"},
+ {"key": "KeyZ"},
+ {"wait": 800},
+ {"shot": "02_title_menu.png"}
+]

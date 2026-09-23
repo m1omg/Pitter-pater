@@ -1,0 +1,6 @@
+[
+ {"wait": 2000},
+ {"hold": "ArrowUp", "ms": 700},
+ {"spam": "KeyZ", "ms": 150000, "every": 90, "until": "Game.scene && Game.scene.mapId==='attic_real' && !Events.running && Game.overlays.length===0"},
+ {"eval": "({map: Game.scene.mapId, ch: State.d.chapter, party: State.d.party, keys: State.d.keyItems, together: State.d.together, errs: Game.errors})"}
+]

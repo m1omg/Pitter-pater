@@ -1,0 +1,4 @@
+[
+ {"wait": 3000},
+ {"eval": "(async()=>{ const ids=['bgm_home','bgm_fort','bgm_crumb','bgm_carpet','bgm_static','bgm_keep','bgm_town','bgm_attic']; for (const id of ids) { await Sound.playBgm(id, {fade: 0.01}); } const cached = Object.keys(Sound.buffers).filter(k=>/^(bgm|amb)/.test(k)); await Sound.playBgm('bgm_home'); return {cached, n: cached.length, current: Sound.bgm && Sound.bgm.id, errs: Game.errors}; })()"}
+]
