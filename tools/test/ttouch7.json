@@ -1,0 +1,8 @@
+[
+ {"wait": 3000},
+ {"eval": "window.MLOG = []; const B = Battle.current; const cm = B.closeMenu.bind(B); B.closeMenu = (v) => { MLOG.push((B.ui ? B.ui.type : 'none') + '->' + v + ' @' + Game.frame + ' ok=' + !!Input.pressed.ok + ' q=' + [...Input._pressedQueue].join('')); return cm(v); }; 1"},
+ {"tapspam": [480, 300], "ms": 8000, "every": 250, "until": "Battle.current && Battle.current.ui && Battle.current.ui.type === 'party'"},
+ {"eval": "({phase: 'menu up', ui: Battle.current.ui.type, idx: Battle.current.ui.index, frame: Game.frame, log: MLOG})"},
+ {"swipe": [480, 300, 560, 300], "fast": true}, {"wait": 400},
+ {"eval": "({phase: 'after swipe', ui: Battle.current.ui && Battle.current.ui.type, idx: Battle.current.ui && Battle.current.ui.index, frame: Game.frame, log: MLOG})"}
+]

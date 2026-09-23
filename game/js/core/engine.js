@@ -38,7 +38,7 @@ const Game = {
     this.canvas.style.width = Math.floor(this.W * fit) + 'px';
     this.canvas.style.height = Math.floor(this.H * fit) + 'px';
     const dpr = window.devicePixelRatio || 1;
-    const k = U.clamp(Math.round(fit * dpr * 4) / 4, 1, 2);
+    const k = U.clamp(Math.round(fit * dpr * 4) / 4, 1, Input.touchDevice ? 1.5 : 2);
     if (k !== this.k || this.canvas.width !== Math.round(this.W * k)) {
       this.k = k;
       this.canvas.width = Math.round(this.W * k);
@@ -143,12 +143,35 @@ const Game = {
       ctx.fillRect(0, 0, this.W, this.H);
       ctx.globalAlpha = 1;
     }
+    const ts = Input.ts;
+    if (Input.usingTouch && ts.id != null && !ts.multi && ts.moved) this.drawTouchStick(ctx, ts);
     if (this.showFps) Gfx.text(ctx, Math.round(this._fps) + ' fps  k=' + this.k, 8, 20, { size: 16, color: '#fff', outline: '#000', outlineWidth: 3 });
     if (this.errors.length) {
       ctx.fillStyle = 'rgba(120,0,0,0.85)';
       ctx.fillRect(0, this.H - 22 * this.errors.length - 8, this.W, 22 * this.errors.length + 8);
       this.errors.forEach((e, i) => Gfx.text(ctx, e.slice(0, 150), 6, this.H - 22 * (this.errors.length - i) + 12, { size: 14, color: '#fff', font: 'monospace' }));
     }
+  },
+
+  // faint "virtual stick" under the thumb while swiping
+  drawTouchStick(ctx, ts) {
+    const r = this.canvas.getBoundingClientRect();
+    if (!r.width) return;
+    const sx = this.W / r.width, sy = this.H / r.height;
+    const ax = (ts.x0 - r.left) * sx, ay = (ts.y0 - r.top) * sy;
+    const fx = (ts.x - r.left) * sx, fy = (ts.y - r.top) * sy;
+    const R = Input.MAXR * sx;
+    ctx.save();
+    ctx.globalAlpha = 0.35;
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#fff8ec';
+    ctx.fillStyle = 'rgba(255,248,236,0.18)';
+    ctx.beginPath(); ctx.arc(ax, ay, R, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.globalAlpha = 0.55;
+    ctx.fillStyle = Input.touch.run ? '#ffb8c6' : '#fff8ec';
+    ctx.beginPath(); ctx.arc(fx, fy, R * 0.38, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = Gfx.C.ink; ctx.lineWidth = 2; ctx.stroke();
+    ctx.restore();
   },
 
   setScene(s) {

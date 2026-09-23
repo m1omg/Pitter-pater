@@ -1,0 +1,19 @@
+[
+ {"wait": 5500},
+ {"eval": "({step: 'start', ui: Battle.current.ui && Battle.current.ui.type, idx: Battle.current.ui && Battle.current.ui.index})"},
+ {"swipe": [480, 300, 560, 300], "fast": true}, {"wait": 400},
+ {"eval": "({step: 'swipe right', ui: Battle.current.ui.type, idx: Battle.current.ui.index})"},
+ {"swipe": [560, 300, 480, 300], "fast": true}, {"wait": 400},
+ {"eval": "({step: 'swipe left', ui: Battle.current.ui.type, idx: Battle.current.ui.index})"},
+ {"tap": [480, 300]}, {"wait": 400},
+ {"eval": "({step: 'tap FIGHT', ui: Battle.current.ui.type, actor: Battle.current.ui.actor.id})"},
+ {"swipe": [480, 300, 480, 360], "fast": true}, {"wait": 400},
+ {"eval": "({step: 'swipe down', ui: Battle.current.ui.type, idx: Battle.current.ui.index})"},
+ {"tap": [480, 300]}, {"wait": 400},
+ {"eval": "({step: 'tap SKILLS', ui: Battle.current.ui.type, mode: Battle.current.ui.mode})"},
+ {"shot": "touch_battle_skills.png"},
+ {"tap2": [300, 300]}, {"wait": 400},
+ {"eval": "({step: 'two-finger back', ui: Battle.current.ui.type})"},
+ {"tap2": [300, 300]}, {"wait": 400},
+ {"eval": "({step: 'two-finger back again', ui: Battle.current.ui.type, errors: Game.errors})"}
+]

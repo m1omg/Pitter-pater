@@ -1,0 +1,7 @@
+[
+ {"wait": 2000},
+ {"eval": "window.LOG = []; const u = Game.update.bind(Game); Game.update = function() { u(); const p = Game.scene.player; if (LOG.length < 90) LOG.push([Game.frame % 1000, Input.held.left ? 'L' : '-', Input.pressed.left ? 'P' : '-', Input.touch.run ? 'R' : '-', p.x, p.moving ? 'm' : '.', Math.round(p.t * 12)].join(' ')); }; 1"},
+ {"eval": "LOG.length = 0; 1"},
+ {"swipe": [500, 400, 440, 400]}, {"wait": 700},
+ {"eval": "LOG.filter(l => !/ - - - \\d+ \\. \\d+$/.test(l) || true).slice(0, 40)"}
+]

@@ -1,0 +1,7 @@
+[
+ {"wait": 2500},
+ {"shot": "touch_title.png"},
+ {"tap": [480, 400]}, {"wait": 1200},
+ {"eval": "({scene: Game.scene.constructor.name, started: Game.scene.started, hint: Input.hint('start'), touchUI: Input.isTouchUI()})"},
+ {"shot": "touch_title_menu.png"}
+]

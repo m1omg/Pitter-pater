@@ -103,7 +103,7 @@ const Story = {
     await E.say('pim', 'No, Waffles. Cereal isn\'t for dogs.', 'neutral');
     await E.say('biscuit', 'Mrrp.');
     await E.say('pim', 'Shh. Mom is sleeping. We have to be quiet, okay?', 'neutral');
-    await E.say(null, '{c:grey}Arrow keys to walk. Z to look at things and talk. X opens the menu.{/c}');
+    await E.say(null, `{c:grey}${Input.hint('walk')}{/c}`);
     Story.setTasks([['upstairs', 'Go to bed']]);
   },
 };

@@ -258,7 +258,7 @@ MAPS.attic_3 = {
     await E.say('pim', '{c:grey}(Behind me...){/c}', 'surprised');
     E.sfx('jingle_sting');
     await E.say('coat', '{c:grey}Pim.{/c}');
-    await E.say(null, '{c:grey}RUN! (Hold SHIFT to run.){/c}');
+    await E.say(null, `{c:grey}RUN! (${Input.hint('run')}){/c}`);
   },
 };
 

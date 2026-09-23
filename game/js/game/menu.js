@@ -324,7 +324,7 @@ class OptionsPanel {
       { label: 'Sound volume', get: () => Math.round(State.options.sfx * 10) + '/10', change: (d) => { State.options.sfx = U.clamp(Math.round(State.options.sfx * 10 + d) / 10, 0, 1); Sound.applyVolumes(); Sound.sfx('sfx_cursor'); } },
       { label: 'Always run', get: () => (State.options.alwaysRun ? 'On' : 'Off'), change: () => { State.options.alwaysRun = !State.options.alwaysRun; } },
       { label: 'Screen shake', get: () => (State.options.screenShake ? 'On' : 'Off'), change: () => { State.options.screenShake = !State.options.screenShake; } },
-      { label: 'Fullscreen (F4)', get: () => (document.fullscreenElement ? 'On' : 'Off'), change: () => Input.toggleFullscreen() },
+      { label: Input.isTouchUI() ? 'Fullscreen' : 'Fullscreen (F4)', get: () => (document.fullscreenElement ? 'On' : 'Off'), change: () => Input.toggleFullscreen() },
     ];
   }
   update() {

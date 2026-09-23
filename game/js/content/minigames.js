@@ -84,13 +84,13 @@ const Popcorn = {
           if (!this.started) {
             Gfx.box(ctx, W / 2 - 230, H / 2 - 80, 460, 140, {});
             Gfx.text(ctx, 'POPCORN CATCH', W / 2, H / 2 - 30, { size: 36, font: Gfx.BOLD, align: 'center' });
-            Gfx.text(ctx, '◀ ▶ to move. Don\'t catch the burnt ones!', W / 2, H / 2 + 20, { size: 24, align: 'center', color: Gfx.C.inkSoft });
+            Gfx.text(ctx, Input.hint('sideways') + ' Don\'t catch the burnt ones!', W / 2, H / 2 + 20, { size: 24, align: 'center', color: Gfx.C.inkSoft });
           }
           if (this.done) {
             Gfx.box(ctx, W / 2 - 200, H / 2 - 80, 400, 150, {});
             Gfx.text(ctx, 'TIME!', W / 2, H / 2 - 28, { size: 40, font: Gfx.BOLD, align: 'center' });
             Gfx.text(ctx, this.score + ' popcorn caught', W / 2, H / 2 + 20, { size: 28, align: 'center' });
-            if (this.t - this.doneT > 60) Gfx.text(ctx, 'press Z', W / 2, H / 2 + 54, { size: 20, align: 'center', color: Gfx.C.inkSoft });
+            if (this.t - this.doneT > 60) Gfx.text(ctx, Input.hint('again'), W / 2, H / 2 + 54, { size: 20, align: 'center', color: Gfx.C.inkSoft });
           }
         },
       };

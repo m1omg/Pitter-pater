@@ -1,0 +1,22 @@
+[
+ {"wait": 2000},
+ {"eval": "window.pos = () => [Game.scene.player.x, Game.scene.player.y]; pos()"},
+ {"swipe": [400, 400, 470, 400]}, {"wait": 700},
+ {"eval": "({afterQuickSwipe: pos()})"},
+ {"swipe": [400, 400, 440, 400], "ms": 900}, {"wait": 500},
+ {"eval": "({afterHoldWalk: pos()})"},
+ {"swipe": [500, 400, 500, 520], "ms": 500}, {"wait": 500},
+ {"eval": "({afterFarSwipeDown: pos(), runTouch: Input.touch.run})"},
+ {"tap2": [300, 300]}, {"wait": 500},
+ {"eval": "({overlay: Game.overlays.map(o => o.constructor.name), idx: Game.overlays[0] && Game.overlays[0].index})"},
+ {"swipe": [480, 300, 480, 360]}, {"wait": 400},
+ {"eval": "({menuIndexAfterSwipeDown: Game.overlays[0] && Game.overlays[0].index})"},
+ {"shot": "touch_menu.png"},
+ {"tap2": [300, 300]}, {"wait": 500},
+ {"eval": "({overlaysAfterClose: Game.overlays.length})"},
+ {"eval": "E.setPos('player', 12, 6, 'up'); 1"}, {"wait": 200},
+ {"tap": [480, 360]}, {"wait": 900},
+ {"eval": "({dialogueOpen: Msg.isOpen, text: Msg.pages && Msg.pages[0] && Msg.pages[0].filter(g=>!g.cmd).map(g=>g.ch).join('').slice(0,60)})"},
+ {"shot": "touch_talk.png"},
+ {"eval": "Game.errors"}
+]

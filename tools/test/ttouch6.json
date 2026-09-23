@@ -1,0 +1,13 @@
+[
+ {"wait": 3500},
+ {"tapspam": [480, 300], "ms": 8000, "every": 200, "until": "Battle.current && Battle.current.ui && Battle.current.ui.type === 'party'"},
+ {"swipe": [480, 300, 560, 300], "fast": true}, {"wait": 300},
+ {"eval": "({partyMenuIndexAfterSwipeRight: Battle.current.ui.index})"},
+ {"swipe": [560, 300, 480, 300], "fast": true}, {"wait": 300},
+ {"tap": [480, 300]}, {"wait": 400},
+ {"eval": "({ui: Battle.current.ui && Battle.current.ui.type, actor: Battle.current.ui && Battle.current.ui.actor && Battle.current.ui.actor.id})"},
+ {"tap2": [300, 300]}, {"wait": 400},
+ {"eval": "({afterTwoFingerTap: Battle.current.ui && Battle.current.ui.type})"},
+ {"tapspam": [480, 300], "ms": 90000, "every": 180, "until": "!Battle.current"},
+ {"eval": "({battleOver: !Battle.current, scene: Game.scene.constructor.name, errors: Game.errors})"}
+]

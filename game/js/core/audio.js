@@ -47,6 +47,8 @@ const Sound = {
     };
     window.addEventListener('keydown', unlock);
     window.addEventListener('pointerdown', unlock);
+    window.addEventListener('touchend', unlock);   // iOS only unlocks audio on touchend/click
+    window.addEventListener('click', unlock);
     window.addEventListener('gamepadconnected', unlock);
     // the game loop stops in hidden tabs, so pause the music with it
     document.addEventListener('visibilitychange', () => {

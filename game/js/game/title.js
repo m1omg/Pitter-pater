@@ -99,8 +99,8 @@ class TitleScene {
     }
     if (!this.started) {
       const a = 0.5 + Math.sin(this.t * 0.06) * 0.5;
-      Gfx.text(ctx, 'press Z / Enter', Game.W / 2, 610, { size: 30, align: 'center', color: '#fff8ec', alpha: a, outline: '#3a2a40', outlineWidth: 6 });
-      Gfx.text(ctx, 'arrow keys: move  ·  Z: confirm  ·  X: cancel/menu  ·  Shift: run  ·  F4: fullscreen', Game.W / 2, 700, { size: 18, align: 'center', color: '#d9d2e6', alpha: 0.8 });
+      Gfx.text(ctx, Input.hint('start'), Game.W / 2, 610, { size: 30, align: 'center', color: '#fff8ec', alpha: a, outline: '#3a2a40', outlineWidth: 6 });
+      Gfx.text(ctx, Input.hint('line'), Game.W / 2, 700, { size: 18, align: 'center', color: '#d9d2e6', alpha: 0.8 });
       return;
     }
     const a = Math.min(1, (this.t - this.startT) / 30);

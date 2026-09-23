@@ -1,0 +1,12 @@
+[
+ {"wait": 2000},
+ {"eval": "window.pos = () => [Game.scene.player.x, Game.scene.player.y]; pos()"},
+ {"swipe": [500, 400, 420, 400], "fast": true}, {"wait": 600},
+ {"eval": "({afterFastFlickLeft80px: pos()})"},
+ {"swipe": [400, 400, 480, 400], "fast": true}, {"wait": 600},
+ {"eval": "({afterFastFlickRight80px: pos()})"},
+ {"swipe": [400, 400, 400, 330], "fast": true}, {"wait": 600},
+ {"eval": "({afterFastFlickUp: pos()})"},
+ {"swipe": [400, 300, 400, 400], "fast": true}, {"wait": 600},
+ {"eval": "({afterFastFlickDown: pos(), errors: Game.errors})"}
+]

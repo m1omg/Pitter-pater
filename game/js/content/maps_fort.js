@@ -240,6 +240,6 @@ Object.assign(Story, {
     s.followers = ['biscuit', 'waffles'].map((id) => new Char({ id, kind: 'follower', x: s.player.x, y: s.player.y, dir: s.player.dir, sprite: charSprite(id, 'dream'), solid: false }));
     s.trail = [];
     await E.fadeIn(12);
-    await E.say(null, '{c:grey}BISCUIT and WAFFLES joined the party! Press X to open the menu.{/c}');
+    await E.say(null, `{c:grey}BISCUIT and WAFFLES joined the party! ${Input.hint('menu')}{/c}`);
   },
 });

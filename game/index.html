@@ -2,13 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#16131a">
 <title>PITTER-PATTER</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 6c14 0 26 10 26 24H6C6 16 18 6 32 6z' fill='%23e0483e' stroke='%233a2a2a' stroke-width='3'/%3E%3Cpath d='M32 30v22c0 5-8 5-8 0' fill='none' stroke='%233a2a2a' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
-  html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #16131a; overflow: hidden; }
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #16131a; overflow: hidden;
+               touch-action: none; overscroll-behavior: none; -webkit-user-select: none; user-select: none;
+               -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
   body { display: flex; align-items: center; justify-content: center; }
-  #game { display: block; image-rendering: auto; outline: none; box-shadow: 0 0 60px rgba(0,0,0,0.6); }
+  #game { display: block; image-rendering: auto; outline: none; box-shadow: 0 0 60px rgba(0,0,0,0.6); touch-action: none; }
+  #rotate { display: none; position: fixed; left: 0; right: 0; bottom: 18px; text-align: center; pointer-events: none;
+            color: #d9d2c3; font: 15px sans-serif; opacity: 0.8; }
+  @media (orientation: portrait) and (pointer: coarse) { #rotate { display: block; } }
   #boot { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
           color: #d9d2c3; font: 20px sans-serif; letter-spacing: 2px; pointer-events: none; }
 </style>
@@ -16,6 +24,7 @@
 <body>
 <div id="boot">loading…</div>
 <canvas id="game" tabindex="0"></canvas>
+<div id="rotate">Turn your device sideways for a bigger picture ↻</div>
 
 <!-- engine -->
 <script src="js/fonts_data.js"></script>

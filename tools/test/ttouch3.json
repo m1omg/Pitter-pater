@@ -1,0 +1,17 @@
+[
+ {"wait": 2000},
+ {"eval": "window.pos = () => [Game.scene.player.x, Game.scene.player.y]; pos()"},
+ {"swipe": [400, 400, 470, 400]}, {"wait": 700},
+ {"eval": "({afterLongFlick: pos()})"},
+ {"swipe": [400, 400, 430, 400]}, {"wait": 700},
+ {"eval": "({afterShortFlick: pos()})"},
+ {"swipe": [500, 400, 440, 400]}, {"wait": 700},
+ {"eval": "({afterFlickLeft: pos()})"},
+ {"eval": "E.setPos('player', 3, 9, 'right'); window.t0 = performance.now(); 1"},
+ {"swipe": [300, 400, 400, 400], "ms": 1000}, {"wait": 400},
+ {"eval": "({afterRunHold: pos(), note: 'from x=3, ~1.1s held far out'})"},
+ {"eval": "E.setPos('player', 3, 9, 'right'); 1"},
+ {"swipe": [300, 400, 330, 400], "ms": 1000}, {"wait": 400},
+ {"eval": "({afterWalkHold: pos(), note: 'from x=3, ~1.1s held near'})"},
+ {"eval": "Game.errors"}
+]

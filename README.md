@@ -32,6 +32,17 @@ Or download this repository and use any of these (no install needed):
 
 Gamepads work too (A = confirm, B = cancel).
 
+**Touch screens (phones and tablets):**
+
+| Gesture | Action |
+|---|---|
+| Swipe | walk one step, or move a menu cursor |
+| Swipe and hold | keep walking (hold further out to run) |
+| One-finger tap | confirm, talk, examine (like Z) |
+| Two-finger tap | back, open the menu (like X) |
+
+Landscape works best on phones.
+
 It takes about 1–2 hours. Save at the glowing lights in the dream and at Pim's bed at home.
 You get three save files.
 
