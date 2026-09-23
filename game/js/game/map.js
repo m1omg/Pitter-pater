@@ -587,10 +587,35 @@ class MapScene {
     }
     for (const p of this.particles) {
       p.x += p.vx; p.y += p.vy; p.life--;
-      if (p.ground && p.y > p.ground && !p.splash) { p.splash = 1; p.vx = 0; p.vy = 0; p.life = Math.min(p.life, 10); }
+      if (p.ground && p.y > p.ground && !p.splash) {
+        if (this.rainLands(p.x, p.y)) { p.splash = 1; p.vx = 0; p.vy = 0; p.life = Math.min(p.life, 10); }
+        else p.life = 0;   // it hit a wall, a roof or something tall: no ripple hanging in mid-air
+      }
       if (p.splash) p.splash++;
     }
     this.particles = this.particles.filter((p) => p.life > 0 && p.y < Game.H + 30);
+  }
+
+  // Can a raindrop landing at this screen point leave a ripple? Only on open floor or water:
+  // not on walls or the void, and not on furniture, trees or people standing there.
+  rainLands(sx, sy) {
+    const wx = sx + this.camX, wy = sy + this.camY;
+    const tx = Math.floor(wx / TS), ty = Math.floor(wy / TS);
+    if (!this.inBounds(tx, ty)) return false;
+    const L = this.def.legendFull[this.def.tiles[ty][tx]];
+    const mat = L ? L.mat : 'void';
+    if (mat === 'void' || mat === 'wall' || mat === 'hole') return false;
+    for (const p of this.props) {
+      if (!p.visible || p.layer === 'ground') continue;
+      const img = Assets.get(p.img);
+      const dw = p.dw || (img ? p.dh * (img.width / img.height) : p.fw * TS * 0.9);
+      const cx = (p.x + p.fw / 2) * TS + p.ox, by = (p.y + p.fh) * TS + p.oy;
+      if (wx > cx - dw / 2 && wx < cx + dw / 2 && wy > by - p.dh && wy < by) return false;
+    }
+    for (const c of [this.player, ...this.followers, ...this.events, ...this.enemies]) {
+      if (c.visible && c.sprite && Math.abs(wx - c.px) < 22 && wy < c.py && wy > c.py - (c.dh || 84)) return false;
+    }
+    return true;
   }
 
   drawWeather(ctx) {

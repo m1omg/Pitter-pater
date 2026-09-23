@@ -25,6 +25,7 @@ const PROPS = {
   stairs_down: deco('p_stairs', 100, [2, 2]),
   stairs_up: deco('p_stairs_up', 100, [2, 2]),
   photo_frames: deco('p_photo_frames', 56, [2, 1], { oy: -24 }),
+  photo_frames_folded: deco('p_photo_frames_folded', 56, [2, 1], { oy: -24 }),   // downstairs: Dad's side folded away
   side_plant: P('p_side_plant', 84, [1, 1]),
   attic_ladder: deco('p_attic_ladder', 120, [1, 2], { oy: 4 }),
   fridge: P('p_fridge', 126, [1, 1]),

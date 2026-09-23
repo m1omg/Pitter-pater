@@ -256,7 +256,7 @@ MAPS.downstairs = {
     ['stairs_up', 20, 1, { layer: 'ground', solid: false }],
     ['fridge', 1, 3], ['counter', 2, 3], ['stove', 4, 3], ['counter', 5, 3], ['washer', 8, 3], ['window', 5, 2],
     ['kitchen_table', 4, 6], ['chair', 3, 7], ['chair', 6, 6], ['pet_bowls', 8, 9],
-    ['tv', 14, 3], ['bookshelf', 17, 3], ['plant', 22, 3], ['photo_frames', 11, 2], ['window', 18, 2],
+    ['tv', 14, 3], ['bookshelf', 17, 3], ['plant', 22, 3], ['photo_frames_folded', 11, 2], ['window', 18, 2],
     ['rug_long', 13, 5], ['coffee_table', 14, 6], ['couch', 13, 8], ['floor_lamp', 17, 8], ['phone_table', 21, 8],
   ],
   exits: [

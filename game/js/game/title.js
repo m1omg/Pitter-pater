@@ -2,6 +2,12 @@
 // ---------------------------------------------------------------------------
 // Title screen
 // ---------------------------------------------------------------------------
+// Where rain can splash in the title picture (screen coordinates with the picture unpanned):
+// only the wet street, not the bushes at the sides or the street hidden behind Waffles,
+// Pim and Biscuit ([left, right, feet line]).
+const TITLE_STREET = { far: 584, near: Game.H, farRight: 596, left: 110, right: 800 };
+const TITLE_STANDING = [[112, 254, 644], [274, 350, 648], [338, 424, 655]];
+
 class TitleScene {
   constructor() {
     this.t = 0;
@@ -16,12 +22,25 @@ class TitleScene {
     this.index = State.anySave() ? 1 : 0;
   }
   items() { return ['NEW GAME', 'CONTINUE', 'OPTIONS']; }
+  pan() { return Math.sin(this.t * 0.002) * 10; }
+  // does a raindrop landing here hit visible street? (otherwise it fell into a bush or behind someone)
+  onStreet(x, y) {
+    const S = TITLE_STREET, px = x - this.pan();
+    if (px < S.left || y < (px > S.right ? S.farRight : S.far)) return false;
+    return !TITLE_STANDING.some(([l, r, feet]) => px > l && px < r && y < feet);
+  }
   update() {
     this.t++; Title.t = this.t;
     // rain
-    for (let i = 0; i < 3; i++) this.drops.push({ x: Math.random() * (Game.W + 200) - 100, y: -20, vy: 9 + Math.random() * 5, len: 10 + Math.random() * 12, ground: 300 + Math.random() * 420 });
-    for (const d of this.drops) { if (d.splash) d.splash++; else { d.y += d.vy; d.x -= 1.2; if (d.y > d.ground) d.splash = 1; } }
-    this.drops = this.drops.filter((d) => !d.splash || d.splash < 12);
+    for (let i = 0; i < 3; i++) this.drops.push({ x: Math.random() * (Game.W + 200) - 100, y: -20, vy: 9 + Math.random() * 5, len: 10 + Math.random() * 12, ground: TITLE_STREET.far + Math.random() * (TITLE_STREET.near - TITLE_STREET.far) });
+    for (const d of this.drops) {
+      if (d.splash) d.splash++;
+      else {
+        d.y += d.vy; d.x -= 1.2;
+        if (d.y > d.ground) { if (this.onStreet(d.x, d.ground)) { d.y = d.ground; d.splash = 1; } else d.gone = true; }
+      }
+    }
+    this.drops = this.drops.filter((d) => !d.gone && (!d.splash || d.splash < 12));
     if (this.busy || Game.overlays.length) return;
     if (!this.started) {
       if (Input.isPressed('ok') || Input.isPressed('cancel') || Input.anyKeyThisFrame) {
@@ -75,7 +94,7 @@ class TitleScene {
     const img = Assets.get('cg_title');
     if (img) {
       const s = Math.max(Game.W / img.width, Game.H / img.height);
-      const pan = Math.sin(this.t * 0.002) * 10;
+      const pan = this.pan();
       ctx.drawImage(img, (Game.W - img.width * s) / 2 + pan, (Game.H - img.height * s) / 2, img.width * s, img.height * s);
       ctx.fillStyle = 'rgba(30,24,50,0.18)'; ctx.fillRect(0, 0, Game.W, Game.H);
     } else this.drawFallback(ctx);
@@ -83,8 +102,12 @@ class TitleScene {
     ctx.save();
     ctx.strokeStyle = 'rgba(210,225,255,0.6)'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
     for (const d of this.drops) {
-      if (d.splash) { ctx.globalAlpha = 1 - d.splash / 12; ctx.beginPath(); ctx.ellipse(d.x, d.y, d.splash, d.splash * 0.35, 0, 0, Math.PI * 2); ctx.stroke(); }
-      else { ctx.globalAlpha = 0.7; ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x + 1.8, d.y - d.len); ctx.stroke(); }
+      if (d.splash) {
+        // farther away (higher up the street) the ripples are smaller
+        const k = 0.45 + 0.65 * (d.y - TITLE_STREET.far) / (TITLE_STREET.near - TITLE_STREET.far);
+        ctx.globalAlpha = (1 - d.splash / 12) * (0.6 + 0.4 * k); ctx.lineWidth = 0.8 + 0.7 * k;
+        ctx.beginPath(); ctx.ellipse(d.x, d.y, d.splash * k, d.splash * 0.35 * k, 0, 0, Math.PI * 2); ctx.stroke();
+      } else { ctx.globalAlpha = 0.7; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x + 1.8, d.y - d.len); ctx.stroke(); }
     }
     ctx.restore();
     Gfx.vignette(ctx, 0.45);

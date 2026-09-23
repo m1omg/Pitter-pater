@@ -78,6 +78,8 @@ The game is released under the GPL-3.0 licence (see `LICENSE`). The bundled font
 * `tools/art`: image generation jobs (`jobs.py`), the Codex relay (`gen.py`) and slicing/manifest (`process.py`).
   To regenerate one picture: delete `art_raw/<name>.png`, run `python3 tools/art/gen.py --only <name>`, then
   `python3 tools/art/process.py <name>`. The raw sheets live in `art_raw/`, and the game uses the processed files in `game/img/`.
+  Hand-edited variants of generated pictures (such as the folded family photo) are listed in `DERIVED` in `process.py`
+  and rebuilt along with their source; `process.py --derive` rebuilds only those.
 * `tools/audio`: the synthesizer and compositions for all music and sound effects.
 * `tools/test`: headless Chrome test driver (`node run.js steps.json`).
 * Debug: `index.html?map=crumb_1&x=5&y=10&ch=1&lv=5` jumps straight to a map. F2 shows collision, F3 shows FPS.

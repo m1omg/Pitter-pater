@@ -3,6 +3,7 @@
 and write game/img/manifest.js.
 
 python3 tools/art/process.py [name ...]      (no names = process everything available)
+python3 tools/art/process.py --derive        (only rebuild the derived images, see DERIVED)
 A contact sheet of every sliced sheet is written to tools/art/preview/ for checking.
 """
 import collections, json, os, sys
@@ -373,6 +374,66 @@ def process(name, manifest):
     return True
 
 
+# ---------------------------------------------------------------------------
+# Derived images: hand-made variants of processed sprites, rebuilt whenever their source is.
+
+def fold_family_photo(im):
+    """The family photo downstairs, with Dad's side folded back behind the frame.
+    The photo is mirrored so Dad stands on the right, the bit of him that shows beside Pim is
+    painted over with paper, and past the fold the frame's cardboard backing shows. The numbers
+    are tuned to the current p_photo_frames art: check them again if that picture is regenerated."""
+    a = np.asarray(im.convert('RGBA')).astype(np.float32)
+    x0, y0, x1, y1 = 41, 65, 170, 148               # the photo inside the big frame (end exclusive)
+    a[y0:y1, x0:x1] = a[y0:y1, x0:x1][:, ::-1]       # mirror it: Mom, Pim, Dad
+    fold = 128                                       # the crease, just right of Pim's hair
+    ink = np.array((74, 60, 52), np.float32)         # the outline colour of the drawing
+    paper = a[82:103, 99:107, :3].reshape(-1, 3).copy()   # clean paper between Mom and Dad
+    rng = np.random.default_rng(7)
+    # Pim stands in front of Dad: the last column that is still her, per row (her head outline
+    # down to row 121, then the right edge of her hair, which gets its outline back)
+    edge = {106: 108, 107: 108, 108: 112, 109: 114, 110: 115, 111: 117, 112: 118, 113: 119, 114: 120,
+            115: 121, 116: 121, 117: 122, 118: 122, 119: 123, 120: 123, 121: 123}
+    edge.update({y: 125 for y in range(122, 148)})
+    edge.update({128: 126, 134: 126, 135: 126, 136: 126, 137: 126, 143: 124, 144: 124, 145: 124, 146: 124})
+    for y in range(76, y1):
+        left = 99 if y < 106 else edge[y] + 1        # above Pim only Dad's hair shows: back to Mom's side
+        if y >= 122:
+            a[y, edge[y], :3] = a[y, edge[y], :3] * 0.3 + ink * 0.7
+        for x in range(left, fold):
+            a[y, x, :3] = paper[rng.integers(len(paper))]   # its grain, without a repeating pattern
+    # the crease: the paper darkens as it bends away, its edge catches the light
+    for k, f in ((3, 0.97), (2, 0.93), (1, 0.87)):
+        a[y0:y1, fold - k, :3] *= f
+    a[y0:y1, fold, :3] = (252, 247, 236)
+    a[y0:y1, fold + 1, :3] = ink
+    # past it, the cardboard backing, in the shadow of the fold and of the frame
+    kraft = np.array((196, 164, 122), np.float32)
+    for y in range(y0, y1):
+        for x in range(fold + 2, x1):
+            shade = 1 - 0.32 * max(0.0, 1 - (x - fold - 2) / 8) ** 1.5    # shadow of the folded paper
+            shade *= 1 - 0.22 * max(0.0, 1 - (y - y0) / 5)                 # the frame's top edge
+            shade *= 1 - 0.16 * max(0.0, 1 - (x1 - 1 - x) / 4)             # its right edge
+            shade *= 1 - 0.12 * max(0.0, 1 - (y1 - 1 - y) / 3)             # its bottom edge
+            a[y, x, :3] = (kraft + rng.normal(0, 3.5)) * shade
+    return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), 'RGBA')
+
+
+DERIVED = {'p_photo_frames_folded': ('p_photo_frames', fold_family_photo)}
+
+
+def derive(manifest):
+    for ident, (source, fn) in DERIVED.items():
+        if source not in manifest:
+            continue
+        src = os.path.join(IMG, manifest[source]['file'])
+        dst = os.path.join(IMG, FOLDER(ident), ident + '.png')
+        if not os.path.exists(src):
+            continue
+        if not os.path.exists(dst) or os.path.getmtime(dst) < os.path.getmtime(src):
+            manifest[ident] = dict(file=save(fn(Image.open(src)), ident))
+            print('derived', ident)
+
+
 def write_manifest(manifest):
     extra = {}
     if os.path.exists(MANIFEST_EXTRA):
@@ -389,12 +450,15 @@ def write_manifest(manifest):
 
 
 def main():
-    names = sys.argv[1:] or sorted(SPEC.keys())
+    # no arguments: every sheet; --derive: only the derived images (see DERIVED)
+    args = sys.argv[1:]
+    names = [] if args == ['--derive'] else args or sorted(SPEC.keys())
     mpath = os.path.join(HERE, 'manifest_state.json')
     manifest = json.load(open(mpath)) if os.path.exists(mpath) else {}
     for n in names:
         if process(n, manifest):
             print('processed', n)
+    derive(manifest)
     json.dump(manifest, open(mpath, 'w'), indent=1, sort_keys=True)
     write_manifest(manifest)
     print(len(manifest), 'images in manifest')

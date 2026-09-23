@@ -498,6 +498,9 @@ var IMG_MANIFEST = {
 "p_photo_frames": {
 "file": "props/p_photo_frames.png"
 },
+"p_photo_frames_folded": {
+"file": "props/p_photo_frames_folded.png"
+},
 "p_photo_stand": {
 "file": "props/p_photo_stand.png"
 },
