@@ -56,7 +56,7 @@ class PauseMenu {
   update(active) {
     this.t++;
     this.anim = Math.min(1, this.anim + 0.15);
-    if (!active) return;
+    if (!active || (this.sub && this.sub.busy)) return;
     const hits = Input.rowHits(this.options.length, 24, 35, 200, 48);
     if (this.sub) {
       const i = Input.hitIndex(hits, Input.tapPos);
@@ -186,7 +186,7 @@ class ItemsPanel {
     if (Input.isPressed('ok') && L.length && this.tab === 0) {
       const it = ITEMS[L[this.index]];
       if (it.field) { Sound.sfx('sfx_confirm', { volume: 0.6 }); this.picker = new PartyPicker(); this.picker.active = true; this.showParty = true; this.partySel = this.picker; }
-    }
+    } else if (Input.isPressed('ok') && L.length) Sound.sfx('sfx_buzzer');   // not used from here (see the hint)
   }
   draw(ctx) {
     if (this.picker) {
@@ -219,7 +219,8 @@ class ItemsPanel {
       const it = ITEMS[L[this.index]];
       ctx.strokeStyle = 'rgba(58,42,48,0.25)'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(x + 20, y + h - 96); ctx.lineTo(x + w - 20, y + h - 96); ctx.stroke();
-      const lines = Gfx.wrap(ctx, it.desc || '', w - 60, 24, Gfx.FONT);
+      const hint = it.type === 'trinket' ? ' Use it in battle: choose ITEMS.' : it.type === 'sticker' ? ' Put it on in STICKERS.' : '';
+      const lines = Gfx.wrap(ctx, (it.desc || '') + hint, w - 60, 24, Gfx.FONT);
       lines.slice(0, 2).forEach((l, i) => Gfx.text(ctx, l, x + 28, y + h - 60 + i * 30, { size: 24, color: Gfx.C.inkSoft }));
     }
   }
@@ -354,11 +355,22 @@ class OptionsPanel {
       { label: Input.isTouchUI() ? 'Fullscreen' : 'Fullscreen (F4)', get: () => (document.fullscreenElement ? 'On' : 'Off'), change: () => Input.toggleFullscreen() },
     ];
     if (Input.touchDevice || Input.usingTouch) this.items.push({ label: 'Touch joystick', get: () => (State.options.touchStick ? 'On' : 'Off'), change: () => { State.options.touchStick = !State.options.touchStick; } });
+    this.items.push(
+      { label: 'Export saves', action: () => SaveTransfer.exportSaves() },
+      { label: 'Import saves', action: () => SaveTransfer.importSaves() },
+    );
   }
   rect() {
-    return this.menu ? { x: 244, y: 24, w: 692 } : { x: 180, y: 150, w: 600 };
+    const h = this.items.length * 54 + 100;
+    return this.menu ? { x: 244, y: 24, w: 692, h } : { x: 180, y: Math.min(150, Math.floor((Game.H - h) / 2)), w: 600, h };
+  }
+  async run(it) {
+    Sound.sfx('sfx_confirm', { volume: 0.6 });
+    this.busy = true;
+    try { await it.action(); } catch (e) { console.error(e); } finally { this.busy = false; Input.clear(); }
   }
   update() {
+    if (this.busy) return;
     const tap = Input.takeTap();
     if (tap) {
       // tap a row to highlight it (again to change it), or tap the ◀ / ▶ side of its value
@@ -366,6 +378,7 @@ class OptionsPanel {
       const i = Input.hitIndex(Input.rowHits(this.items.length, x + 16, y + 72, w - 32, 54), tap);
       if (i < 0) return;
       const it = this.items[i];
+      if (it.action) { this.index = i; this.run(it); return; }
       const d = tap.x >= x + w - 250 ? (tap.x < x + w - 105 ? -1 : 1) : i === this.index ? 1 : 0;
       this.index = i;
       if (d) { it.change(d); State.saveOptions(); }
@@ -374,21 +387,119 @@ class OptionsPanel {
     }
     listNav(this, this.items.length);
     const it = this.items[this.index];
-    if (Input.repeat('left')) { it.change(-1); State.saveOptions(); Sound.sfx('sfx_cursor', { volume: 0.5 }); }
-    if (Input.repeat('right') || Input.isPressed('ok')) { it.change(1); State.saveOptions(); Sound.sfx('sfx_cursor', { volume: 0.5 }); }
+    if (it.action) { if (Input.isPressed('ok')) this.run(it); }
+    else {
+      if (Input.repeat('left')) { it.change(-1); State.saveOptions(); Sound.sfx('sfx_cursor', { volume: 0.5 }); }
+      if (Input.repeat('right') || Input.isPressed('ok')) { it.change(1); State.saveOptions(); Sound.sfx('sfx_cursor', { volume: 0.5 }); }
+    }
     if (Input.isPressed('cancel')) { Sound.sfx('sfx_cancel', { volume: 0.5 }); State.saveOptions(); if (this.onClose) this.onClose(); else this.menu.sub = null; }
   }
   draw(ctx) {
-    const { x, y, w } = this.rect(), h = this.items.length * 54 + 100;
+    const { x, y, w, h } = this.rect();
     Gfx.box(ctx, x, y, w, h, {});
     Gfx.text(ctx, 'OPTIONS', x + 30, y + 50, { size: 32, font: Gfx.BOLD });
     this.items.forEach((it, i) => {
       const yy = y + 76 + i * 54;
       if (i === this.index) { Gfx.roundRect(ctx, x + 16, yy, w - 32, 46, 10); ctx.fillStyle = Gfx.C.select; ctx.fill(); Gfx.cursor(ctx, x + 32, yy + 23, (this.menu || Title).t || 0); }
       Gfx.text(ctx, it.label, x + 56, yy + 33, { size: 26 });
-      Gfx.text(ctx, '◀ ' + it.get() + ' ▶', x + w - 40, yy + 33, { size: 24, font: Gfx.BOLD, align: 'right' });
+      if (!it.action) Gfx.text(ctx, '◀ ' + it.get() + ' ▶', x + w - 40, yy + 33, { size: 24, font: Gfx.BOLD, align: 'right' });
     });
   }
+}
+
+// ---------------------------------------------------------------------------
+// Moving save files to another browser or device: as a code to paste, or as a file.
+// ---------------------------------------------------------------------------
+const SaveTransfer = {
+  async ask(text, options, cancel) {
+    await Msg.show(null, text, { autoResolve: true });
+    const i = await choose(options, { cancel });
+    Msg.release();
+    return i;
+  },
+  say(text) { return Msg.show(null, text); },
+  list(names) { return names.length < 2 ? names.join('') : names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1]; },
+
+  async exportSaves() {
+    const code = State.exportSaves();
+    if (!code) { Sound.sfx('sfx_buzzer'); await this.say('There are no save files to export yet.'); return; }
+    const i = await this.ask('Export your save files as...', ['A code to paste', 'A file to download', 'Never mind'], 2);
+    if (i === 0) {
+      if (await copyText(code)) {
+        Sound.sfx('sfx_confirm');
+        await this.say('Save code copied! On the other device or browser, go to OPTIONS, choose Import saves and paste it.');
+      } else {
+        window.prompt('Copy this save code, then go to OPTIONS on the other device or browser and choose Import saves:', code);
+        Input.reset();
+      }
+    } else if (i === 1) {
+      downloadText(`pitter-patter-saves-${new Date().toISOString().slice(0, 10)}.txt`, code);
+      Sound.sfx('sfx_confirm');
+      await this.say('Downloaded! On the other device or browser, go to OPTIONS, choose Import saves and open that file.');
+    }
+  },
+
+  async importSaves() {
+    const i = await this.ask('Import save files from...', ['A code', 'A file', 'Never mind'], 2);
+    if (i === 0) {
+      const text = window.prompt('Paste your PITTER-PATTER save code:');
+      Input.reset();
+      if (text) await this.importText(text);
+    } else if (i === 1) {
+      // the menu doesn't wait for the file: the import carries on whenever one is picked
+      pickTextFile((text) => this.importText(text));
+    }
+  },
+
+  async importText(text) {
+    const saves = State.readExport(text);
+    if (!saves) { Sound.sfx('sfx_buzzer'); await this.say('Hmm, that isn\'t a PITTER-PATTER save code.'); return; }
+    const slots = Object.keys(saves).sort();
+    const found = slots.map((k) => { const d = JSON.parse(saves[k]); return `FILE ${k} (${d.location || 'somewhere'}, ${U.formatTime(d.playTime || 0)})`; });
+    const here = slots.filter((k) => State.peek(k)).map((k) => 'FILE ' + k);
+    const q = `Found ${this.list(found)}.` + (here.length ? ` ${this.list(here)} on this device will be replaced.` : '') + ' Import?';
+    if ((await this.ask(q, ['Import', 'Never mind'], 1)) !== 0) return;
+    if (!State.importSaves(saves)) { Sound.sfx('sfx_buzzer'); await this.say('The browser wouldn\'t let the game save here, so nothing was imported.'); return; }
+    Sound.sfx('sfx_save');
+    await this.say(Game.scene instanceof TitleScene ? 'Done! Choose CONTINUE to play it.' : 'Done! Load it with CONTINUE on the title screen.');
+  },
+};
+
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch (e) { /* try the older way */ }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:-9999px;top:0';
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    return ok;
+  } catch (e) { return false; }
+}
+
+function downloadText(name, text) {
+  const url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.style.display = 'none';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+
+// let the player pick a file, and hand its text to onText once they have
+function pickTextFile(onText) {
+  const old = document.getElementById('save-file-input');
+  if (old) old.remove();
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.id = 'save-file-input'; inp.accept = '.txt,.json,text/plain,application/json';
+  inp.style.display = 'none';
+  inp.addEventListener('change', () => {
+    const f = inp.files && inp.files[0];
+    inp.remove();
+    Input.reset();
+    if (f) f.text().then(onText, () => {});
+  });
+  document.body.appendChild(inp);
+  inp.click();
 }
 
 // ---------------------------------------------------------------------------
@@ -530,4 +641,4 @@ const Shop = {
   },
 };
 
-window.Menu = Menu; window.SaveMenu = SaveMenu; window.Shop = Shop; window.OptionsPanel = OptionsPanel; window.drawFace = drawFace; window.listNav = listNav;
+window.Menu = Menu; window.SaveMenu = SaveMenu; window.SaveTransfer = SaveTransfer; window.Shop = Shop; window.OptionsPanel = OptionsPanel; window.drawFace = drawFace; window.listNav = listNav;

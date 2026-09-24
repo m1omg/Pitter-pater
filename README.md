@@ -47,7 +47,9 @@ highlights an entry and a second tap chooses it. OPTIONS → *Touch joystick* sh
 while you swipe. Landscape works best on phones.
 
 It takes about 1–2 hours. Save at the glowing lights in the dream and at Pim's bed at home.
-You get three save files.
+You get three save files. They stay in the browser you played in: the website and a downloaded copy each keep their
+own. To move them to another browser or device, use OPTIONS → *Export saves*, then *Import saves* on the other one
+(as a code to paste, or as a file).
 
 ## Battles
 
@@ -57,6 +59,8 @@ Turn-based, with a party of up to four. Feelings work like weather:
 * Mix two and you get a new one: **RAINBOW** (heals every turn), **STORMY** (tough but sulky), **HEATWAVE** (fierce but burning out)
 * Mix all three and the target is **OVERWHELMED**: it loses a turn and takes extra damage.
 * Acting together fills the **TOGETHER** meter. When it's full, use a team move.
+* **Trinkets** are battle toys, used from ITEMS on someone's turn: bubble wands, water balloons and whoopee cushions
+  make anyone CHEERY, GLOOMY or HUFFY (on foes or friends), others deal damage, put a foe to sleep or calm someone down.
 * Pim can't be GLOOMY. When something tries to make her sad, she *smiles it away*.
 
 Enemies don't die, they *calm down*.
@@ -81,5 +85,6 @@ The game is released under the GPL-3.0 licence (see `LICENSE`). The bundled font
   Hand-edited variants of generated pictures (such as the folded family photo) are listed in `DERIVED` in `process.py`
   and rebuilt along with their source; `process.py --derive` rebuilds only those.
 * `tools/audio`: the synthesizer and compositions for all music and sound effects.
-* `tools/test`: headless Chrome test driver (`node run.js steps.json`).
+* `tools/test`: headless Chrome test driver (`node run.js steps.json`, touch: `run_touch.js`). `node savecompat.js` checks that
+  saves from the first release still load, and `node transfer.js` checks Export/Import saves.
 * Debug: `index.html?map=crumb_1&x=5&y=10&ch=1&lv=5` jumps straight to a map. F2 shows collision, F3 shows FPS.

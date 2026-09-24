@@ -64,6 +64,7 @@ const fs = require('fs');
       let p = null;
       try { p = await page.evaluate(`(() => { const g = (${s.tapAt}); const r = Game.canvas.getBoundingClientRect(); return [r.left + g[0] * r.width / Game.W, r.top + g[1] * r.height / Game.H]; })()`); }
       catch (e) { logs.push('[tapAt error] ' + s.tapAt + ': ' + e.message); }
+      if (p && !p.every(Number.isFinite)) { logs.push('[tapAt error] ' + s.tapAt + ': not a position ' + JSON.stringify(p)); p = null; }
       if (p) { await touch('touchStart', [p]); await sleep(60); await touch('touchEnd', []); }
     }
     if (s.tap2) { const [x, y] = s.tap2; await touch('touchStart', [[x, y], [x + 80, y]]); await sleep(90); await touch('touchEnd', []); }

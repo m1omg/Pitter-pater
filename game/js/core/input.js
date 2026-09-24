@@ -306,6 +306,8 @@ const Input = {
   },
   consume(a) { delete this.pressed[a]; },
   clear() { this.pressed = {}; this._pressedQueue.clear(); this.tapPos = null; this._tapPending = null; },
+  // forget every held key (after a browser dialog swallowed the key-up events)
+  reset() { this.down = {}; this.pad = {}; this.releaseDir(true); this.clear(); },
   // direction currently held (last pressed wins, like RPG Maker 4-dir)
   dir4() {
     const order = ['up', 'down', 'left', 'right'];

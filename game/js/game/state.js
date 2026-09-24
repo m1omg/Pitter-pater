@@ -168,6 +168,45 @@ const State = {
     return true;
   },
   anySave() { for (let i = 1; i <= 3; i++) if (this.peek(i)) return true; return false; },
+
+  // ---- moving save files to another browser or device (OPTIONS: Export / Import saves).
+  // The save files travel exactly as they are stored, so the save format itself never changes.
+  EXPORT_TAG: 'PITTERPATTER-SAVES-1:',
+  exportSaves() {
+    const saves = {};
+    for (let i = 1; i <= 3; i++) if (this.peek(i)) saves[i] = localStorage.getItem(this.slotKey(i));
+    if (!Object.keys(saves).length) return null;
+    const bytes = new TextEncoder().encode(JSON.stringify({ game: 'pitter-patter', saves }));
+    let bin = '';
+    for (const b of bytes) bin += String.fromCharCode(b);
+    return this.EXPORT_TAG + btoa(bin);   // plain letters survive chat apps and e-mail
+  },
+  // a save code (or file) -> { slot: save file }, or null if it isn't one.
+  // Also takes a raw copy of the browser's storage (pitterpatter_save_N keys).
+  readExport(text) {
+    let obj = null;
+    try {
+      const t = String(text || '').replace(/\s+/g, '');
+      if (t.startsWith(this.EXPORT_TAG)) {
+        const bin = atob(t.slice(this.EXPORT_TAG.length));
+        obj = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0))));
+      } else obj = JSON.parse(String(text));
+    } catch (e) { return null; }
+    if (!obj || typeof obj !== 'object') return null;
+    const src = obj.saves || Object.fromEntries(Object.keys(obj).filter((k) => k.startsWith(SAVE_PREFIX)).map((k) => [k.slice(SAVE_PREFIX.length), obj[k]]));
+    const out = {};
+    for (const [slot, raw] of Object.entries(src || {})) {
+      if (!['1', '2', '3'].includes(slot) || typeof raw !== 'string') continue;
+      let d = null;
+      try { d = JSON.parse(raw); } catch (e) { continue; }
+      if (d && typeof d === 'object' && Array.isArray(d.party) && d.actors && typeof d.actors === 'object') out[slot] = raw;
+    }
+    return Object.keys(out).length ? out : null;
+  },
+  importSaves(saves) {
+    try { for (const [slot, raw] of Object.entries(saves)) localStorage.setItem(this.slotKey(slot), raw); return true; }
+    catch (e) { return false; }
+  },
   // snapshot used for "try again" after losing a battle
   snapshot() { return JSON.stringify(this.data); },
   restore(snap) { this.data = JSON.parse(snap); },
