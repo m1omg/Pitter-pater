@@ -88,3 +88,5 @@ The game is released under the GPL-3.0 licence (see `LICENSE`). The bundled font
 * `tools/test`: headless Chrome test driver (`node run.js steps.json`, touch: `run_touch.js`). `node savecompat.js` checks that
   saves from the first release still load, and `node transfer.js` checks Export/Import saves.
 * Debug: `index.html?map=crumb_1&x=5&y=10&ch=1&lv=5` jumps straight to a map. F2 shows collision, F3 shows FPS.
+
+AI model used - Claude Opus 5.5 Max at effort in CLI Claude Code on Linux.
