@@ -384,6 +384,12 @@ var IMG_MANIFEST = {
 "p_counter": {
 "file": "props/p_counter.png"
 },
+"p_counter_plain": {
+"file": "props/p_counter_plain.png"
+},
+"p_counter_sink": {
+"file": "props/p_counter_sink.png"
+},
 "p_crayon": {
 "file": "props/p_crayon.png"
 },

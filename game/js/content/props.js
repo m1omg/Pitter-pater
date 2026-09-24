@@ -1,7 +1,7 @@
 'use strict';
 // ---------------------------------------------------------------------------
 // Prop definitions. img: image id; dh: display height; foot: [w,h] tiles;
-// layer: ground (flat, under characters) | mid (y-sorted) | top (overhead).
+// layer: ground (flat, under characters) | mid (y-sorted) | top (overhead); flip / flipY mirror the image.
 // Some small decorations are drawn procedurally (draw2).
 // ---------------------------------------------------------------------------
 const P = (img, dh, foot, o = {}) => Object.assign({ img, dh, foot }, o);
@@ -22,14 +22,15 @@ const PROPS = {
   rug_long: deco('p_rug_long', 100, [4, 2], { oy: 4 }),
   door: deco('p_door', 100, [1, 2], { oy: 2 }),
   door_mom: deco('p_door_mom', 100, [1, 2], { oy: 2 }),
-  stairs_down: deco('p_stairs', 100, [2, 2]),
+  stairs_down: deco('p_stairs', 100, [2, 2], { flipY: true }),   // painted heading away from us: flipped so it leads down from the hallway
   stairs_up: deco('p_stairs_up', 100, [2, 2]),
   photo_frames: deco('p_photo_frames', 56, [2, 1], { oy: -24 }),
   photo_frames_folded: deco('p_photo_frames_folded', 56, [2, 1], { oy: -24 }),   // downstairs: Dad's side folded away
   side_plant: P('p_side_plant', 84, [1, 1]),
   attic_ladder: deco('p_attic_ladder', 120, [1, 2], { oy: 4 }),
   fridge: P('p_fridge', 126, [1, 1]),
-  counter: P('p_counter', 92, [2, 1]),
+  counter_sink: P('p_counter_sink', 92, [2, 1]),     // sink and toaster (the toast is drawn by the kitchen, see makeToast)
+  counter_plain: P('p_counter_plain', 92, [2, 1]),   // the same counter with nothing on it
   stove: P('p_stove', 92, [1, 1]),
   washer: P('p_washer', 92, [1, 1]),
   kitchen_table: P('p_kitchen_table', 104, [2, 2]),

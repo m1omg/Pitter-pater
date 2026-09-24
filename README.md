@@ -58,7 +58,7 @@ Turn-based, with a party of up to four. Feelings work like weather:
 * **CHEERY** ☀ faster and luckier, but careless · **GLOOMY** ☂ sturdier and slower, regains PEP · **HUFFY** ⚡ hits hard, guards badly
 * Mix two and you get a new one: **RAINBOW** (heals every turn), **STORMY** (tough but sulky), **HEATWAVE** (fierce but burning out)
 * Mix all three and the target is **OVERWHELMED**: it loses a turn and takes extra damage.
-* Acting together fills the **TOGETHER** meter. When it's full, use a team move.
+* Acting together fills the **TOGETHER** meter. When it's full, use a team move: it takes the whole party's turn.
 * **Trinkets** are battle toys, used from ITEMS on someone's turn: bubble wands, water balloons and whoopee cushions
   make anyone CHEERY, GLOOMY or HUFFY (on foes or friends), others deal damage, put a foe to sleep or calm someone down.
 * Pim can't be GLOOMY. When something tries to make her sad, she *smiles it away*.

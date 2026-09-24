@@ -75,9 +75,9 @@ MAPS.pim_room = {
     {
       id: 'desk', x: 8, y: 3, w: 2, solid: false,
       async run(E) {
-        if (ch() >= 4) { await E.say(null, 'Pim\'s drawing for the art show. A house, a sun, and three people holding hands.'); await E.say('pim', think('The art show was yesterday.'), 'forced'); return; }
-        await E.say(null, 'Pim\'s drawing for the art show. A house, a big yellow sun, and three people holding hands.');
-        await E.say('pim', think('It\'s not finished. I can\'t decide if the sun should have a face.'), 'neutral');
+        if (ch() >= 4) { await E.say(null, 'Pim\'s drawing for the art show. A rainbow and a little pink heart. The sun never got drawn in.'); await E.say('pim', think('The art show was yesterday.'), 'forced'); return; }
+        await E.say(null, 'Pim\'s drawing for the art show. A rainbow and a little pink heart.');
+        await E.say('pim', think('It\'s not finished. It needs a big yellow sun, but I can\'t decide if the sun should have a face.'), 'neutral');
       },
     },
     { id: 'window', x: 4, y: 2, w: 2, solid: false, async run(E) { await E.say(null, 'Rain on the window. The street outside is grey and empty.'); } },
@@ -149,6 +149,17 @@ MAPS.hallway = {
     { x: 1, y: 5, w: 2, to: 'downstairs', tx: 20, ty: 3, tdir: 'down', dir: 'down' },
   ],
   events: [
+    {
+      id: 'photos_left', x: 5, y: 2, w: 2, solid: false,
+      async run(E) {
+        await E.say(null, 'Family photos. Pim, Mom and Dad, squished together and smiling. Biscuit as a tiny kitten. A painted flower.');
+        await E.say('pim', think('Dad\'s still in this one.'), 'neutral');
+      },
+    },
+    {
+      id: 'photos_right', x: 12, y: 2, w: 2, solid: false,
+      async run(E) { await E.say(null, 'The same photos again: Pim, Mom and Dad, kitten Biscuit and the flower. Mom liked them so much she hung them twice.'); },
+    },
     {
       id: 'bathroom', x: 10, y: 2, solid: false,
       async run(E) { await E.say(null, 'The bathroom. The towels haven\'t been washed in a while.'); },
@@ -230,6 +241,87 @@ MAPS.hallway = {
   },
 };
 
+// ---- the toaster on the kitchen counter (counter_sink at 5,3) ----
+// Where its slot is: pixels of the p_counter_sink picture (325x287, shown 92 px tall) -> map pixels.
+function toasterSlot() {
+  const k = 92 / 287, left = 6 * TS - (325 * k) / 2, top = 4 * TS - 92;
+  return { x0: left + 233 * k, x1: left + 280 * k, rim: top + 28 * k, lip: top + 38 * k };
+}
+const mixRGB = (a, b, t, f = 1) => `rgb(${a.map((v, i) => Math.round((v + (b[i] - v) * t) * f)).join(',')})`;
+
+// two slices of bread (lift: how far their tops stand above the slot's front lip; done: 0 bread .. 1 toast)
+function drawToast(ctx, ev) {
+  const s = toasterSlot();
+  const x0 = s.x0 - ev.px, x1 = s.x1 - ev.px, rim = s.rim - ev.py, lip = s.lip - ev.py, w = x1 - x0;
+  if (ev.glow > 0) {
+    // the wires glow inside the slot, and the air above it wobbles
+    ctx.fillStyle = `rgba(255,120,40,${0.8 * ev.glow})`;
+    ctx.fillRect(x0 + 1, rim + 1, w - 2, lip - rim - 1);
+    ctx.strokeStyle = `rgba(255,236,210,${0.55 * ev.glow})`; ctx.lineWidth = 1;
+    for (let i = 0; i < 3; i++) {
+      const p = ((ev.animT + i * 22) % 66) / 66, x = x0 + w * (0.25 + i * 0.25), y = rim - 3 - p * 16;
+      ctx.globalAlpha = 1 - p;
+      ctx.beginPath(); ctx.moveTo(x, y + 6); ctx.quadraticCurveTo(x + 2.5 * Math.sin(ev.animT * 0.2 + i), y + 3, x, y); ctx.stroke();
+    }
+    ctx.globalAlpha = ev.alpha;
+  }
+  ctx.save();
+  ctx.beginPath(); ctx.rect(x0 - 8, lip - 60, w + 16, 60); ctx.clip();   // below the lip the toaster hides the bread
+  for (const [dx, dy, f] of [[1.6, -1.2, 0.86], [0, 0, 1]]) {
+    const bx = x0 + 1.5 + dx, bw = w - 4, by = lip - ev.lift + dy, bh = 24;   // taller than it looks: its foot stays in the slot
+    ctx.beginPath();
+    ctx.moveTo(bx, by + bh); ctx.lineTo(bx, by + 3.5);
+    ctx.quadraticCurveTo(bx - 1, by - 0.5, bx + bw / 2, by - 0.5);
+    ctx.quadraticCurveTo(bx + bw + 1, by - 0.5, bx + bw, by + 3.5);
+    ctx.lineTo(bx + bw, by + bh); ctx.closePath();
+    ctx.fillStyle = mixRGB([214, 164, 98], [146, 80, 34], ev.done, f); ctx.fill();
+    ctx.lineWidth = 1; ctx.strokeStyle = Gfx.C.ink; ctx.stroke();
+    ctx.fillStyle = mixRGB([250, 236, 202], [230, 168, 92], ev.done, f);
+    Gfx.roundRect(ctx, bx + 1.6, by + 2, bw - 3.2, bh - 3, 2); ctx.fill();
+  }
+  ctx.restore();
+  if (ev.popAt != null) {
+    // a few puffs of steam after the pop
+    const age = ev.animT - ev.popAt;
+    if (age < 60) {
+      ctx.fillStyle = '#fff';
+      for (let i = 0; i < 3; i++) {
+        const a = Math.max(0, age - i * 8) / 52;
+        if (a <= 0 || a >= 1) continue;
+        ctx.globalAlpha = ev.alpha * 0.6 * (1 - a);
+        ctx.beginPath(); ctx.arc(x0 + w * (0.3 + i * 0.2) + Math.sin(a * 6 + i) * 2, lip - ev.lift - 4 - a * 22, 2 + a * 4, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.globalAlpha = ev.alpha;
+    }
+  }
+}
+
+// Pim makes toast: bread in, lever down, it glows, POP.
+async function makeToast(E) {
+  const fx = E.spawn({ id: 'toast_fx', x: 6, y: 3, solid: false, sortOff: 10, draw2: drawToast });
+  Object.assign(fx, { lift: 20, done: 0, glow: 0, alpha: 0, popAt: null });
+  const bread = (async () => {
+    await Game.tween(fx, { alpha: 1 }, 8);
+    await Game.tween(fx, { lift: 9 }, 16, U.ease.inOutSine);
+    await E.wait(6);
+    E.sfx('sfx_switch');
+    await Game.tween(fx, { lift: -1 }, 8, U.ease.inQuad);
+  })();
+  await E.say(null, 'Pim puts two slices of bread in the toaster and pushes the lever down.');
+  await bread;
+  Game.tween(fx, { glow: 1 }, 30);
+  await Game.tween(fx, { done: 1 }, 150, U.ease.linear);
+  await Game.tween(fx, { glow: 0 }, 12);
+  E.sfx('sfx_toaster');
+  fx.popAt = fx.animT;
+  await Game.tween(fx, { lift: 19 }, 9, U.ease.outQuad);
+  await Game.tween(fx, { lift: 10 }, 12, U.ease.inQuad);
+  await E.wait(30);
+  await E.say(null, 'Golden! Not burnt at all! Pim butters them edge to edge.');
+  await Game.tween(fx, { alpha: 0 }, 10);
+  E.removeEvent('toast_fx');
+}
+
 MAPS.downstairs = {
   name: 'Downstairs', area: 'Downstairs',
   tiles: [
@@ -254,7 +346,7 @@ MAPS.downstairs = {
   bgm: homeBgm, amb: homeAmb,
   props: [
     ['stairs_up', 20, 1, { layer: 'ground', solid: false }],
-    ['fridge', 1, 3], ['counter', 2, 3], ['stove', 4, 3], ['counter', 5, 3], ['washer', 8, 3], ['window', 5, 2],
+    ['fridge', 1, 3], ['counter_plain', 2, 3], ['stove', 4, 3], ['counter_sink', 5, 3], ['washer', 8, 3], ['window', 5, 2],
     ['kitchen_table', 4, 6], ['chair', 3, 7], ['chair', 6, 6], ['pet_bowls', 8, 9],
     ['tv', 14, 3], ['bookshelf', 17, 3], ['plant', 22, 3], ['photo_frames_folded', 11, 2], ['window', 18, 2],
     ['rug_long', 13, 5], ['coffee_table', 14, 6], ['couch', 13, 8], ['floor_lamp', 17, 8], ['phone_table', 21, 8],
@@ -281,10 +373,7 @@ MAPS.downstairs = {
       id: 'toaster', x: 5, y: 3, w: 2, solid: false,
       async run(E) {
         if (ch() === 2 && !Story.taskDone('toast') && !E.flag('has_toast')) {
-          await E.say(null, 'Pim puts two slices of bread in the toaster and watches it very carefully.');
-          E.sfx('sfx_toaster');
-          await E.wait(40);
-          await E.say(null, 'Golden! Not burnt at all! Pim butters them edge to edge.');
+          await makeToast(E);
           E.setFlag('has_toast');
           await E.say('pim', think('I\'ll bring it up to Mom.'), 'cheery');
           return;
@@ -296,6 +385,12 @@ MAPS.downstairs = {
     {
       id: 'drawer', x: 2, y: 3, w: 2, solid: false,
       async run(E) {
+        if (ch() === 2 && !Story.taskDone('feed') && !E.has('pet_food')) {
+          await E.say(null, 'The cupboard under the counter. The big bag of pet food lives here.');
+          await E.say(null, 'Pim hugs it out. It\'s almost as big as Waffles.');
+          await E.give('pet_food');
+          return;
+        }
         if (ch() === 4 && E.flag('want_album') && !E.has('flashlight')) {
           await E.say(null, 'The junk drawer. Rubber bands, dead batteries, takeout menus...');
           await E.say(null, '...and Dad\'s old flashlight.');
@@ -323,7 +418,13 @@ MAPS.downstairs = {
       id: 'bowls', x: 8, y: 9, solid: false,
       async run(E) {
         if (ch() === 2 && !Story.taskDone('feed')) {
+          if (!E.has('pet_food')) {
+            await E.say(null, 'Two empty pet bowls. Biscuit and Waffles are staring at them very hard.');
+            await E.say('pim', think('The pet food is in the cupboard, under the counter by the fridge.'), 'neutral');
+            return;
+          }
           await E.say(null, 'Pim pours kibble into the two bowls. Crunchy fish shapes for Biscuit, crunchy bone shapes for Waffles.');
+          E.take('pet_food');
           E.sfx('sfx_bark');
           await E.say('waffles', 'Wuff! Wuff!');
           E.sfx('sfx_meow');
@@ -338,7 +439,7 @@ MAPS.downstairs = {
     { id: 'tv', x: 14, y: 3, w: 2, solid: false, async run(E) { if (ch() >= 4) { await E.say(null, 'The TV is off. Pim remembers the three of them on the couch, laughing so hard Dad snorted.'); return; } await E.say(null, 'The TV is off. Nobody has watched it in a while.'); } },
     { id: 'shelf', x: 17, y: 3, w: 2, solid: false, async run(E) { await E.say(null, 'Cookbooks. A sticky note in one says "Sunday pancakes!!" with a little smiley face.'); } },
     { id: 'couch', x: 13, y: 8, w: 3, solid: false, async run(E) { await E.say(null, 'Mom\'s blanket is folded on the couch. She used to fall asleep here during movies.'); } },
-    { id: 'photos', x: 11, y: 2, solid: false, async run(E) { await E.say(null, 'Family photos. In one of them, the right side has been folded back behind the frame.'); await E.say('pim', think('That\'s where Dad was.'), 'neutral'); } },
+    { id: 'photos', x: 11, y: 2, w: 2, solid: false, async run(E) { await E.say(null, 'Family photos. In one of them, the right side has been folded back behind the frame.'); await E.say('pim', think('That\'s where Dad was.'), 'neutral'); } },
     {
       id: 'phone', x: 21, y: 8, solid: false,
       async run(E) {
@@ -681,7 +782,7 @@ Object.assign(Story, {
     Cutscene.stage({ bg: '#1b1622' });
     await E.fadeIn(10);
     await Cutscene.credits();
-    if (State.v('scraps') >= 8) await Story.secretEnding(E);
+    if (State.v('scraps') >= SCRAPS_TOTAL) await Story.secretEnding(E);
     await E.wait(30);
     await Cutscene.card('THE END', 'thank you for playing', { icon: 'heart', keepBg: true, hold: 300 });
     State.d.cleared = true;

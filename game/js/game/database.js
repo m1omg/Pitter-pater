@@ -493,6 +493,7 @@ const ITEMS = {
   sun_toast: { name: 'Sunny Toast', type: 'key', desc: 'Golden and warm. It smells like Saturday mornings.', icon: 'star' },
   laugh_track: { name: 'Laugh Track', type: 'key', desc: 'A little tape of everybody laughing at the TV together.', icon: 'star' },
   fort_key: { name: 'Blanket Key', type: 'key', desc: 'A key made of a folded blanket corner. Soft.', icon: 'key' },
+  pet_food: { name: 'Pet Food', type: 'key', desc: 'The big bag of kibble. Fish shapes for Biscuit, bone shapes for Waffles.', icon: 'treat' },
   flashlight: { name: 'Flashlight', type: 'key', desc: 'Dad\'s old flashlight. The batteries are almost dead.', icon: 'key' },
   attic_key: { name: 'Little Brass Key', type: 'key', desc: 'Found in a sock. Opens something small.', icon: 'key' },
   music_box: { name: 'Music Box', type: 'key', desc: 'It plays a tune Mom used to hum.', icon: 'star' },

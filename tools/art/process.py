@@ -418,7 +418,64 @@ def fold_family_photo(im):
     return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), 'RGBA')
 
 
-DERIVED = {'p_photo_frames_folded': ('p_photo_frames', fold_family_photo)}
+def counter_without_sink(im):
+    """The kitchen counter with the sink, the tap and the toaster taken away, for the second
+    counter in the kitchen (one sink and one toaster are enough). The tiled top is rebuilt row by
+    row from the clean strip between the sink and the toaster: tile body from its middle, grout
+    lines from the line on its right, laid out on the backsplash grid and, on the countertop,
+    towards the vanishing point of its tile lines. Tuned to the current p_counter art."""
+    a = np.asarray(im.convert('RGBA')).astype(np.float32)
+    out = a.copy()
+    tile, line0 = 26.67, 48.0            # the backsplash grid: tile width and one of its grout lines
+    back = 57                            # where the countertop meets the backsplash
+    vx, vy = 190.0, -440.0               # where the countertop's tile lines meet
+    grout, body = 208.5, (187, 205)      # the clean strip: a grout line, and plain tile left of it
+    for y in range(0, 119):
+        if y < 24:
+            xl, xr = 30, 297             # above the backsplash only the tap and the toaster stick out
+        else:
+            xs = np.where(a[y, :, 3] > 128)[0]
+            xl, xr = xs.min() + 5, xs.max() - 5
+        k = 1.0 if y < back else (y - vy) / (back - vy)
+        for x in range(xl, xr + 1):
+            u = vx + (x - vx) / k                     # the same point at the back of the countertop
+            r = (u - line0) % tile                    # where in its tile it is (0 = on a grout line)
+            d = r if r < tile / 2 else r - tile
+            if abs(d) < 1.8:
+                src = grout + d * k
+            else:
+                src = body[0] + (r - 1.8) / (tile - 3.6) * (body[1] - body[0])
+            out[y, x] = a[y, int(round(src))]
+    return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), 'RGBA')
+
+
+def counter_empty_toaster(im):
+    """The kitchen counter with nothing in the toaster: the toast is drawn by the game, so that it
+    can go in and pop up. Behind the old toast comes the backsplash (from counter_without_sink),
+    then the toaster gets its top edge and an empty, dark slot. Tuned to the current p_counter art."""
+    a = np.asarray(im.convert('RGBA')).astype(np.float32)
+    bg = np.asarray(counter_without_sink(im)).astype(np.float32)
+    ink = np.array((40, 30, 24), np.float32)
+    cream = np.array((246, 232, 208), np.float32)
+    a[0:25, 229:287] = bg[0:25, 229:287]            # the toast that stuck out, and the backsplash behind it
+    a[25:27, 226:286, :3] = ink                     # the toaster's top edge
+    a[25:27, 226:286, 3] = 255
+    a[27, 229:284, :3] = cream                      # a little of its top, behind the slot
+    x0, x1, y0, y1 = 232, 281, 28, 38               # the slot (y1: the dark front lip already there)
+    for y in range(y0, y1):
+        dark = np.array((58, 46, 38), np.float32) * (1 - 0.45 * (y - y0) / (y1 - y0))   # deeper is darker
+        a[y, x0 + 1:x1, :3] = dark
+    a[y0, x0:x1 + 1, :3] = ink
+    a[y0:y1, x0, :3] = ink
+    a[y0:y1, x1, :3] = ink
+    return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), 'RGBA')
+
+
+DERIVED = {
+    'p_photo_frames_folded': ('p_photo_frames', fold_family_photo),
+    'p_counter_plain': ('p_counter', counter_without_sink),
+    'p_counter_sink': ('p_counter', counter_empty_toaster),
+}
 
 
 def derive(manifest):

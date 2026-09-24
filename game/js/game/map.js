@@ -144,6 +144,7 @@ class Prop {
     ctx.translate(cx, by + dy);
     ctx.rotate(rot);
     ctx.scale(sx * (this.flip ? -1 : 1), sy);
+    if (this.flipY) { ctx.translate(0, -this.dh); ctx.scale(1, -1); }   // upside down, in the same box
     if (img) {
       const dh = this.dh, dw = this.dw || dh * (img.width / img.height);
       ctx.drawImage(img, -dw / 2, -dh, dw, dh);

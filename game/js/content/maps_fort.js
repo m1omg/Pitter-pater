@@ -13,7 +13,8 @@ function starryVoid(g, map) {
   }
 }
 
-// photo scraps: 8 hidden around the dream
+// photo scraps: 7 hidden around the dream (all of them unlock the secret ending)
+const SCRAPS_TOTAL = 7;
 function scrapEvent(id, x, y) {
   return {
     id, x, y, solid: false, cond: () => !State.flag(id),
@@ -30,9 +31,9 @@ function scrapEvent(id, x, y) {
       const n = State.addV('scraps');
       State.addItem('photo_scrap');
       E.sfx('sfx_item');
-      await E.say(null, `Found a {c:orange}Photo Scrap{/c}! (${n}/8)`);
+      await E.say(null, `Found a {c:orange}Photo Scrap{/c}! (${n}/${SCRAPS_TOTAL})`);
       if (n === 1) await E.say('pim', '{c:grey}(A little torn piece of a photo. There\'s a bit of blue sky on it.){/c}', 'neutral');
-      if (n === 8) await E.say('pim', '{c:grey}(That\'s all of them. Maybe I can fix the photo... someday.){/c}', 'cheery');
+      if (n === SCRAPS_TOTAL) await E.say('pim', '{c:grey}(That\'s all of them. Maybe I can fix the photo... someday.){/c}', 'cheery');
     },
   };
 }

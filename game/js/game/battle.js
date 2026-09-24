@@ -255,6 +255,8 @@ class BattleScene {
         i = j;
         continue;
       }
+      // a TOGETHER move is the whole party's turn: whatever the others picked, they join in instead
+      if (a.type === 'together') return [a];
       acts[i] = a;
       i++;
     }
