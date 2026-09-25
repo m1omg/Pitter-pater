@@ -4,16 +4,20 @@
 // Actions: up down left right ok cancel run menu
 // ---------------------------------------------------------------------------
 const Input = {
-  keyMap: {
-    ArrowUp: 'up', KeyW: 'up',
-    ArrowDown: 'down', KeyS: 'down',
-    ArrowLeft: 'left', KeyA: 'left',
-    ArrowRight: 'right', KeyD: 'right',
-    KeyZ: 'ok', Enter: 'ok', Space: 'ok', NumpadEnter: 'ok',
-    KeyX: 'cancel', Escape: 'cancel', Backspace: 'cancel',
-    ShiftLeft: 'run', ShiftRight: 'run',
-    KeyC: 'menu', Tab: 'menu',
+  // Keys that always work, so nobody can lock themselves out of the menus by rebinding.
+  FIXED_KEYS: { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', Enter: 'ok', Escape: 'cancel' },
+  // The rebindable keys (OPTIONS > Controls keeps its own copy in State.options.keys).
+  // Up to two per action; a Shift / Ctrl / Alt entry stands for both the left and the right key.
+  DEFAULT_KEYS: {
+    up: ['KeyW'], down: ['KeyS'], left: ['KeyA'], right: ['KeyD'],
+    ok: ['KeyZ', 'NumpadEnter'],
+    cancel: ['KeyX', 'ShiftLeft'],
+    run: ['Space'],
+    menu: ['KeyC', 'Tab'],
   },
+  ACTIONS: ['up', 'down', 'left', 'right', 'ok', 'cancel', 'run', 'menu'],
+  keyMap: {},
+  bindings: null,
   down: {},        // raw held state from keyboard
   pad: {},         // held state from gamepad
   held: {},        // combined held (sampled once per frame)
@@ -25,8 +29,43 @@ const Input = {
   listeners: [],
   enabled: true,
 
+  // key code -> action, from the fixed keys and the player's bindings
+  setBindings(keys) {
+    const b = {};
+    for (const a of this.ACTIONS) b[a] = (keys && Array.isArray(keys[a]) ? keys[a] : this.DEFAULT_KEYS[a]).filter((c) => typeof c === 'string' && !this.FIXED_KEYS[c]);
+    this.bindings = b;
+    this.keyMap = Object.assign({}, this.FIXED_KEYS);
+    for (const a of this.ACTIONS) for (const c of b[a]) for (const k of this.keyGroup(c)) this.keyMap[k] = a;
+    this.down = {};
+  },
+  // Shift, Ctrl and Alt are bound as a pair (left and right)
+  keyGroup(code) {
+    const m = /^(Shift|Control|Alt|Meta)(Left|Right)$/.exec(code);
+    return m ? [m[1] + 'Left', m[1] + 'Right'] : [code];
+  },
+  // the one code a binding is stored as (ShiftRight -> ShiftLeft)
+  keyId(code) { return this.keyGroup(code)[0]; },
+  keyName(code) {
+    const names = { ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→', Space: 'Space', Enter: 'Enter', NumpadEnter: 'Num Enter', Escape: 'Esc', Backspace: 'Backspace', Tab: 'Tab', CapsLock: 'Caps Lock', Backquote: '`', Minus: '-', Equal: '=', BracketLeft: '[', BracketRight: ']', Backslash: '\\', Semicolon: ';', Quote: "'", Comma: ',', Period: '.', Slash: '/' };
+    if (names[code]) return names[code];
+    let m = /^(Shift|Control|Alt|Meta)(Left|Right)$/.exec(code);
+    if (m) return { Shift: 'Shift', Control: 'Ctrl', Alt: 'Alt', Meta: 'Meta' }[m[1]];
+    if ((m = /^Key([A-Z])$/.exec(code))) return m[1];
+    if ((m = /^Digit(\d)$/.exec(code))) return m[1];
+    if ((m = /^Numpad(.+)$/.exec(code))) return 'Num ' + m[1];
+    return code;
+  },
+  // the keys of an action as shown to the player ("Z / Enter")
+  keysText(a, max = 2) {
+    const codes = [...this.bindings[a], ...Object.keys(this.FIXED_KEYS).filter((c) => this.FIXED_KEYS[c] === a)];
+    const names = [...new Set(codes.map((c) => this.keyName(c)))];
+    return names.slice(0, max).join(' / ') || '—';
+  },
+
   init() {
+    if (!this.bindings) this.setBindings(null);
     window.addEventListener('keydown', (e) => {
+      if (this.capture) { this.capture(e); e.preventDefault(); return; }
       const a = this.keyMap[e.code];
       if (e.code === 'F4' || (e.code === 'Enter' && e.altKey)) { this.toggleFullscreen(); e.preventDefault(); return; }
       if (a) {
@@ -238,14 +277,15 @@ const Input = {
       sideways: 'Swipe and hold left or right.',
       again: 'tap',
     };
+    const k = (a) => this.keysText(a, 1);
     const K = {
-      start: 'press Z / Enter',
-      line: 'arrow keys: move  ·  Z: confirm  ·  X: cancel/menu  ·  Shift: run  ·  F4: fullscreen',
-      walk: 'Arrow keys to walk. Z to look at things and talk. X opens the menu.',
-      menu: 'Press X to open the menu.',
-      run: 'Hold SHIFT to run.',
+      start: 'press ' + this.keysText('ok'),
+      line: `arrow keys: move  ·  ${k('ok')}: confirm  ·  ${k('cancel')}: cancel/menu  ·  ${k('run')}: run  ·  F4: fullscreen`,
+      walk: `Arrow keys to walk. ${k('ok')} to look at things and talk. ${k('cancel')} opens the menu.`,
+      menu: `Press ${k('cancel')} to open the menu.`,
+      run: `Hold ${k('run').toUpperCase()} to run.`,
       sideways: '◀ ▶ to move.',
-      again: 'press Z',
+      again: 'press ' + k('ok'),
     };
     return (this.isTouchUI() ? T : K)[kind];
   },
@@ -283,9 +323,8 @@ const Input = {
     if (this._tapPending) { this.tapPos = this.toGame(this._tapPending[0], this._tapPending[1]); this._tapPending = null; }
     // touch: run only when a swipe is held far out for a moment (a quick flick is always one step)
     if (this.ts.dir) this.touch.run = (this.ts.dist || 0) >= this.RUN_DIST && performance.now() - this.ts.dirSince > 220;
-    const actions = ['up', 'down', 'left', 'right', 'ok', 'cancel', 'run', 'menu'];
     this.pressed = {};
-    for (const a of actions) {
+    for (const a of this.ACTIONS) {
       const h = !!(this.down[a] || this.pad[a] || this.touch[a]);
       if (h && !this.held[a]) this.pressed[a] = true;
       if (this._pressedQueue.has(a)) this.pressed[a] = true;

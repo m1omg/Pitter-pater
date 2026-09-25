@@ -354,6 +354,7 @@ class OptionsPanel {
       { label: 'Screen shake', get: () => (State.options.screenShake ? 'On' : 'Off'), change: () => { State.options.screenShake = !State.options.screenShake; } },
       { label: Input.isTouchUI() ? 'Fullscreen' : 'Fullscreen (F4)', get: () => (document.fullscreenElement ? 'On' : 'Off'), change: () => Input.toggleFullscreen() },
     ];
+    if (!Input.isTouchUI()) this.items.push({ label: 'Controls', action: () => ControlsPanel.open() });
     if (Input.touchDevice || Input.usingTouch) this.items.push({ label: 'Touch joystick', get: () => (State.options.touchStick ? 'On' : 'Off'), change: () => { State.options.touchStick = !State.options.touchStick; } });
     this.items.push(
       { label: 'Export saves', action: () => SaveTransfer.exportSaves() },
@@ -404,6 +405,117 @@ class OptionsPanel {
       Gfx.text(ctx, it.label, x + 56, yy + 33, { size: 26 });
       if (!it.action) Gfx.text(ctx, '◀ ' + it.get() + ' ▶', x + w - 40, yy + 33, { size: 24, font: Gfx.BOLD, align: 'right' });
     });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// OPTIONS > Controls: two rebindable keys per action. The arrow keys, Enter and Esc
+// always work too, so the menus can never be locked out.
+// ---------------------------------------------------------------------------
+class ControlsPanel {
+  static open() {
+    return new Promise((resolve) => Game.pushOverlay(new ControlsPanel(resolve)));
+  }
+  constructor(done) {
+    this.done = done; this.index = 0; this.col = 0; this.t = 0; this.waiting = null; this.note = null;
+    this.labels = { up: 'Up', down: 'Down', left: 'Left', right: 'Right', ok: 'Confirm / talk', cancel: 'Back / menu', run: 'Run (hold)', menu: 'Menu' };
+    this.rows = [...Input.ACTIONS, 'reset', 'done'];
+  }
+  keys() { return State.options.keys || Input.DEFAULT_KEYS; }
+  rect() { return { x: 110, y: 40, w: 740, h: 640 }; }
+  close() {
+    Input.capture = null;
+    Game.removeOverlay(this);
+    Input.clear();
+    this.done();
+  }
+  setKeys(keys) {
+    State.options.keys = keys;
+    State.saveOptions();
+  }
+  activate() {
+    const r = this.rows[this.index];
+    if (r === 'done') { Sound.sfx('sfx_cancel', { volume: 0.5 }); this.close(); return; }
+    if (r === 'reset') { this.setKeys(null); Sound.sfx('sfx_confirm', { volume: 0.6 }); this.note = { text: 'Back to the default keys.', t: 0 }; return; }
+    Sound.sfx('sfx_confirm', { volume: 0.6 });
+    this.waiting = { action: r, col: this.col };
+    Input.capture = (e) => this.onKey(e);
+  }
+  onKey(e) {
+    const code = e.code;
+    if (/^F\d+$/.test(code) || !code) return;   // F4 and friends keep their jobs
+    const w = this.waiting;
+    this.waiting = null;
+    Input.capture = null;
+    Input.clear();
+    if (code === 'Escape') { Sound.sfx('sfx_cancel', { volume: 0.5 }); return; }
+    const keys = {};
+    for (const a of Input.ACTIONS) keys[a] = (this.keys()[a] || []).slice(0, 2);
+    const cur = keys[w.action];
+    if (code === 'Backspace') {
+      cur.splice(w.col, 1);
+      Sound.sfx('sfx_cancel', { volume: 0.5 });
+      this.setKeys(keys);
+      return;
+    }
+    if (Input.FIXED_KEYS[code]) {
+      Sound.sfx('sfx_buzzer');
+      this.note = { text: `${Input.keyName(code)} always means ${this.labels[Input.FIXED_KEYS[code]]}.`, t: 0 };
+      return;
+    }
+    const id = Input.keyId(code);
+    let moved = null;
+    for (const a of Input.ACTIONS) {
+      const i = keys[a].indexOf(id);
+      if (i >= 0 && !(a === w.action && i === w.col)) { keys[a].splice(i, 1); if (a !== w.action) moved = a; }
+    }
+    if (w.col < cur.length) cur[w.col] = id; else cur.push(id);
+    this.setKeys(keys);
+    Sound.sfx('sfx_equip', { volume: 0.6 });
+    if (moved) this.note = { text: `${Input.keyName(code)} was taken off ${this.labels[moved]}.`, t: 0 };
+  }
+  update(active) {
+    this.t++;
+    if (this.note && ++this.note.t > 150) this.note = null;
+    if (!active || this.waiting) return;
+    const { x, y, w } = this.rect();
+    const tap = Input.takeTap();
+    if (tap) {
+      const i = Input.hitIndex(Input.rowHits(this.rows.length, x + 16, y + 74, w - 32, 50), tap);
+      if (i >= 0) { this.index = i; this.col = tap.x > x + 530 ? 1 : 0; this.activate(); }
+      return;
+    }
+    listNav(this, this.rows.length);
+    if (Input.repeat('left') || Input.repeat('right')) { this.col = 1 - this.col; Sound.sfx('sfx_cursor', { volume: 0.5 }); }
+    if (Input.isPressed('ok')) this.activate();
+    else if (Input.isPressed('cancel')) { Sound.sfx('sfx_cancel', { volume: 0.5 }); this.close(); }
+  }
+  draw(ctx) {
+    ctx.fillStyle = 'rgba(20,14,26,0.45)'; ctx.fillRect(0, 0, Game.W, Game.H);
+    const { x, y, w, h } = this.rect();
+    Gfx.box(ctx, x, y, w, h, {});
+    Gfx.text(ctx, 'CONTROLS', x + 30, y + 50, { size: 32, font: Gfx.BOLD });
+    Gfx.text(ctx, 'always', x + w - 40, y + 50, { size: 18, align: 'right', color: Gfx.C.inkSoft });
+    const keys = this.keys();
+    this.rows.forEach((r, i) => {
+      const yy = y + 74 + i * 50;
+      const sel = i === this.index;
+      if (sel) { Gfx.roundRect(ctx, x + 16, yy, w - 32, 44, 10); ctx.fillStyle = Gfx.C.select; ctx.fill(); Gfx.cursor(ctx, x + 32, yy + 22, this.t); }
+      if (r === 'reset' || r === 'done') { Gfx.text(ctx, r === 'reset' ? 'Reset to defaults' : 'Done', x + 56, yy + 31, { size: 25 }); return; }
+      Gfx.text(ctx, this.labels[r], x + 56, yy + 31, { size: 25 });
+      for (let c = 0; c < 2; c++) {
+        const cx = x + 390 + c * 150;
+        const waiting = this.waiting && this.waiting.action === r && this.waiting.col === c;
+        const code = (keys[r] || [])[c];
+        if (sel && c === this.col) { Gfx.roundRect(ctx, cx - 64, yy + 5, 128, 34, 8); ctx.fillStyle = waiting ? '#ffd0dc' : 'rgba(255,255,255,0.7)'; ctx.fill(); }
+        const label = waiting ? (this.t % 40 < 26 ? '...' : '') : code ? Input.keyName(code) : '—';
+        Gfx.text(ctx, label, cx, yy + 30, { size: 22, font: Gfx.BOLD, align: 'center', color: code || waiting ? Gfx.C.ink : Gfx.C.inkSoft });
+      }
+      const fixed = Object.keys(Input.FIXED_KEYS).filter((k) => Input.FIXED_KEYS[k] === r).map((k) => Input.keyName(k)).join(' ');
+      if (fixed) Gfx.text(ctx, fixed, x + w - 40, yy + 30, { size: 20, align: 'right', color: Gfx.C.inkSoft });
+    });
+    const msg = this.waiting ? `Press a key for ${this.labels[this.waiting.action]}.  Esc: cancel  ·  Backspace: clear` : this.note ? this.note.text : 'Choose a key to change it. ◀ ▶ picks the first or second key.';
+    Gfx.text(ctx, msg, x + w / 2, y + h - 22, { size: 20, align: 'center', color: this.waiting ? '#d8578a' : Gfx.C.inkSoft });
   }
 }
 
@@ -641,4 +753,4 @@ const Shop = {
   },
 };
 
-window.Menu = Menu; window.SaveMenu = SaveMenu; window.SaveTransfer = SaveTransfer; window.Shop = Shop; window.OptionsPanel = OptionsPanel; window.drawFace = drawFace; window.listNav = listNav;
+window.Menu = Menu; window.SaveMenu = SaveMenu; window.ControlsPanel = ControlsPanel; window.SaveTransfer = SaveTransfer; window.Shop = Shop; window.OptionsPanel = OptionsPanel; window.drawFace = drawFace; window.listNav = listNav;

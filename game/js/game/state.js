@@ -6,7 +6,7 @@ const SAVE_PREFIX = 'pitterpatter_save_';
 const OPTIONS_KEY = 'pitterpatter_options';
 
 const State = {
-  options: { textSpeed: 1, bgm: 0.7, sfx: 0.8, master: 0.9, alwaysRun: false, screenShake: true, touchStick: false },
+  options: { textSpeed: 1, bgm: 0.7, sfx: 0.8, master: 0.9, alwaysRun: false, screenShake: true, touchStick: false, keys: null },   // keys: null = default controls
   data: null,
 
   loadOptions() {
@@ -21,6 +21,7 @@ const State = {
     this.applyOptions();
   },
   applyOptions() {
+    Input.setBindings(this.options.keys);
     Sound.volumes.master = this.options.master;
     Sound.volumes.bgm = this.options.bgm;
     Sound.volumes.sfx = this.options.sfx;

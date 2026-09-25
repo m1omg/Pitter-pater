@@ -142,7 +142,7 @@ MAPS.carpet_village = {
           await E.say('sockpuppet', 'Welcome to SOCK\'S SNACKS! I\'m a sock AND a puppet. Double the identity crisis!');
           await E.say('sockpuppet', 'My other half got lost in the laundry. So now I sell things. It helps.');
         }
-        await E.shop(['toast', 'pancakes', 'jelly', 'cocoa', 'soup', 'popper', 'snowglobe', 'kazoo', 'tea', 'st_paw', 'st_smile', 'st_star'], { title: "SOCK'S SNACKS" });
+        await E.shop(['toast', 'pancakes', 'jelly', 'cocoa', 'soup', 'cake', 'popper', 'snowglobe', 'kazoo', 'tea', 'st_paw', 'st_smile', 'st_star'], { title: "SOCK'S SNACKS" });
       },
     },
     {
@@ -286,7 +286,8 @@ MAPS.static_heart = {
   exits: [{ x: 8, y: 15, w: 4, to: 'static_woods', tx: 4, ty: 1, tdir: 'down', dir: 'down' }],
   events: [
     saveEvent('save_sh', 5, 11, 'A little TV shows a warm, crackling fireplace. Everyone feels rested.'),
-    { id: 'boss_zone', x: 6, y: 6, w: 8, trigger: 'touch', solid: false, cond: () => !State.flag('static_down'), async run(E) { await Story.staticFight(E); } },
+    { id: 'boss_zone', x: 2, y: 6, w: 17, trigger: 'touch', solid: false, cond: () => !State.flag('static_down'), async run(E) { await Story.staticFight(E); } },   // the whole width
+    { id: 'static_tv', x: 8, y: 3, w: 4, solid: false, cond: () => !State.flag('static_down'), async run(E) { await Story.staticFight(E); } },
   ],
 };
 

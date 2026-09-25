@@ -4,6 +4,7 @@
 // followers, NPC/event objects, visible enemies, weather and lighting.
 // ---------------------------------------------------------------------------
 const MAPS = {};
+const LOOKS = {};   // what examining a prop says, per map: LOOKS[map][propId or 'propId@x,y'] (content/looks.js)
 const WALK_SPEED = 1 / 12;   // tiles per frame (5 tiles/s)
 const RUN_SPEED = 1 / 7.5;   // 8 tiles/s
 
@@ -122,6 +123,24 @@ class Prop {
     this.visible = this.visible !== false;
   }
   get baseY() { return (this.y + this.fh) * TS + (this.sortOff || 0); }
+  // What examining it says: [[speaker, text, face], ...]. look is a line, a list of lines or a function
+  // returning either; a line is narration text or [speaker, text, face] ('think' = Pim's thought).
+  // Lines of party members who aren't with Pim right now are left out.
+  lookLines() {
+    let L = this.look;
+    if (typeof L === 'function') L = L();
+    if (!L) return [];
+    if (!Array.isArray(L)) L = [L];
+    const out = [];
+    for (const l of L) {
+      if (!l) continue;
+      if (typeof l === 'string') { out.push([null, l]); continue; }
+      const [who, text, face] = l;
+      if (who === 'think') out.push(['pim', `{c:grey}(${text}){/c}`, face || 'neutral']);
+      else if (who === 'pim' || !ACTORS[who] || State.d.party.includes(who)) out.push([who, text, face]);
+    }
+    return out;
+  }
   draw(ctx, t) {
     if (!this.visible) return;
     const cx = (this.x + this.fw / 2) * TS + this.ox;
@@ -201,6 +220,11 @@ class MapScene {
     this.ground = Materials.paintGround(def);
     // props
     this.props = (def.props || []).filter((p) => !p.cond || p.cond()).map((p) => new Prop(Array.isArray(p) ? Object.assign({ id: p[0], x: p[1], y: p[2] }, p[3] || {}) : p));
+    const looks = LOOKS[this.mapId] || {};
+    for (const p of this.props) {
+      const L = looks[`${p.id}@${p.x},${p.y}`] || looks[p.id];
+      if (L !== undefined) p.look = L;
+    }
     for (const p of this.props) {
       if (p.solid && p.layer === 'mid') {
         const fx = p.solidFoot || [0, 0, p.fw, p.fh];
@@ -446,7 +470,20 @@ class MapScene {
       if (ev2.length && this.block[p.y + dy] && this.block[p.y + dy][p.x + dx]) evs = ev2;
     }
     if (!evs.length) evs = this.eventsAt(p.x, p.y).filter((e) => e.trigger === 'action' && !e.solid);
-    if (evs.length) this.runEvent(evs[0], true);
+    if (evs.length) { this.runEvent(evs[0], true); return; }
+    const prop = this.lookablePropAt(p.x + dx, p.y + dy);
+    if (prop) Events.run(async (E) => { for (const line of prop.lookLines()) await E.say(line[0], line[1], line[2]); });
+  }
+
+  // a prop with a description ('look') on this tile; furniture wins over rugs under it
+  lookablePropAt(x, y) {
+    let best = null;
+    for (const pr of this.props) {
+      if (!pr.visible || !pr.lookLines().length) continue;
+      if (x < pr.x || y < pr.y || x >= pr.x + pr.fw || y >= pr.y + pr.fh) continue;
+      if (!best || (best.layer === 'ground' && pr.layer !== 'ground')) best = pr;
+    }
+    return best;
   }
 
   runEvent(ev, faceP) {

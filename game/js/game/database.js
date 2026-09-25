@@ -50,6 +50,11 @@ const MOODS = {
   heatwave: { name: 'HEATWAVE', color: '#ff9e57', icon: 'heatwave', blend: ['cheery', 'huffy'], atk: 1.35, spd: 1.35, burn: 0.06, desc: 'Fast and fierce, but burning out.' },
   overwhelmed: { name: 'OVERWHELMED', color: '#b9aeb5', icon: 'overwhelmed', takeMult: 1.5, desc: 'Too many feelings! Loses a turn and takes extra damage.' },
 };
+// a mood's name at a level (bosses can go one level past the last name: they keep it)
+function moodName(m, lv) {
+  const M = MOODS[m];
+  return M.lvName ? M.lvName[U.clamp(lv || 1, 1, M.lvName.length) - 1] : M.name;
+}
 function blendOf(a, b) {
   for (const k of ['rainbow', 'stormy', 'heatwave']) {
     const bl = MOODS[k].blend;
@@ -101,7 +106,7 @@ const SKILLS = {
     name: 'Twirl', cost: 4, target: 'foe', desc: 'Spin the umbrella into a foe. PIM becomes CHEERY.',
     async run(B, u, t) {
       await B.log(`${u.name} twirls her umbrella!`);
-      await B.attack(u, t, { power: 1.0, sfx: 'sfx_bonk', fx: 'spin' });
+      await B.attack(u, t, { power: 1.25, sfx: 'sfx_bonk', fx: 'spin' });
       await B.mood(u, 'cheery');
     },
   },
@@ -120,7 +125,7 @@ const SKILLS = {
     async run(B, u, ts) {
       await B.log(`${u.name} jumps into a puddle! SPLASH!`);
       Sound.sfx('sfx_splash');
-      for (const t of ts) { if (t.alive) { await B.attack(u, t, { power: 0.6, fx: 'splash', quick: true }); if (t.alive) await B.mood(t, 'gloomy', { quick: true }); } }
+      for (const t of ts) { if (t.alive) { await B.attack(u, t, { power: 0.75, fx: 'splash', quick: true }); if (t.alive) await B.mood(t, 'gloomy', { quick: true }); } }
     },
   },
   its_fine: {
@@ -132,7 +137,7 @@ const SKILLS = {
         return;
       }
       await B.log(`${u.name} smiles. "It's fine! I'm fine!"`);
-      await B.heal(u, Math.round(u.maxhp * 0.35));
+      await B.heal(u, Math.round(u.maxhp * 0.45));
       await B.mood(u, 'cheery');
     },
   },
@@ -149,7 +154,7 @@ const SKILLS = {
     async run(B, u, t) {
       await B.log(`${u.name} swings her umbrella with all her might!`);
       const bonus = t.mood === 'overwhelmed' || t.mood === 'stormy' ? 1.5 : 1;
-      await B.attack(u, t, { power: 2.2 * bonus, sfx: 'sfx_hit_heavy', fx: 'big' });
+      await B.attack(u, t, { power: 2.6 * bonus, sfx: 'sfx_hit_heavy', fx: 'big' });
     },
   },
   sunny_side: {
@@ -183,8 +188,8 @@ const SKILLS = {
     async run(B, u, t) {
       await B.log(`${u.name} wiggles... and POUNCES!`);
       const huff = ['huffy', 'stormy', 'heatwave'].includes(u.mood);
-      await B.attack(u, t, { power: 1.6, sfx: 'sfx_scratch', fx: 'claw' });
-      if (huff && t.alive) { await B.log(`${u.name} pounces again!`); await B.attack(u, t, { power: 1.0, sfx: 'sfx_scratch', fx: 'claw' }); }
+      await B.attack(u, t, { power: 1.9, sfx: 'sfx_scratch', fx: 'claw' });
+      if (huff && t.alive) { await B.log(`${u.name} pounces again!`); await B.attack(u, t, { power: 1.2, sfx: 'sfx_scratch', fx: 'claw' }); }
     },
   },
   knock_off: {
@@ -192,7 +197,7 @@ const SKILLS = {
     async run(B, u, ts) {
       await B.log(`${u.name} stares at you... and knocks everything off the table!`);
       Sound.sfx('sfx_fall');
-      for (const t of ts) if (t.alive) await B.attack(u, t, { power: 0.8, quick: true, fx: 'crash' });
+      for (const t of ts) if (t.alive) await B.attack(u, t, { power: 0.95, quick: true, fx: 'crash' });
     },
   },
   cat_nap: {
@@ -200,7 +205,7 @@ const SKILLS = {
     async run(B, u) {
       await B.log(`${u.name} curls up for a tiny nap. Zzz...`);
       Sound.sfx('sfx_sleep');
-      await B.heal(u, Math.round(u.maxhp * 0.4));
+      await B.heal(u, Math.round(u.maxhp * 0.5));
       B.clearStatuses(u);
     },
   },
@@ -212,7 +217,7 @@ const SKILLS = {
       for (let i = 0; i < n; i++) {
         const t = B.randomAlive(B.foesOf(u));
         if (!t) break;
-        await B.attack(u, t, { power: 0.7, quick: true, fx: 'claw', sfx: 'sfx_scratch' });
+        await B.attack(u, t, { power: 0.85, quick: true, fx: 'claw', sfx: 'sfx_scratch' });
       }
       await B.mood(u, 'cheery');
     },
@@ -283,7 +288,7 @@ const SKILLS = {
     name: 'Belly Flop', cost: 14, target: 'foe', desc: 'A heavy flop. Raises WAFFLES\' DEF.',
     async run(B, u, t) {
       await B.log(`${u.name} jumps up high and BELLY FLOPS!`);
-      await B.attack(u, t, { power: 2.0, sfx: 'sfx_hit_heavy', fx: 'big' });
+      await B.attack(u, t, { power: 2.4, sfx: 'sfx_hit_heavy', fx: 'big' });
       B.buff(u, 'def', 1, 3);
     },
   },
@@ -300,7 +305,7 @@ const SKILLS = {
     name: 'Best Friend', cost: 18, target: 'ally', desc: 'Big warm cuddles. Heals a lot and makes them CHEERY.',
     async run(B, u, t) {
       await B.log(`${u.name} gives ${t.name} the biggest, fluffiest cuddle.`);
-      await B.heal(t, Math.round(t.maxhp * 0.6));
+      await B.heal(t, Math.round(t.maxhp * 0.7));
       await B.mood(t, 'cheery');
     },
   },
@@ -316,7 +321,7 @@ const SKILLS = {
     name: 'Soft Rain', cost: 6, target: 'ally', desc: 'Heals a friend\'s HEART.',
     async run(B, u, t) {
       await B.log(`${u.name} sprinkles a soft, warm rain on ${t === u ? 'herself' : t.name}.`);
-      await B.heal(t, Math.round(t.maxhp * 0.4) + 10);
+      await B.heal(t, Math.round(t.maxhp * 0.45) + 12);
     },
   },
   fluff_up: {
@@ -345,7 +350,7 @@ const SKILLS = {
     name: 'Rainfall', cost: 16, target: 'allies', desc: 'Gentle rain for everyone. Heals all friends.',
     async run(B, u, ts) {
       await B.log(`${u.name} lets a gentle rain fall over everyone.`);
-      for (const t of ts) if (t.alive) B.heal(t, Math.round(t.maxhp * 0.3) + 8, { quick: true });
+      for (const t of ts) if (t.alive) B.heal(t, Math.round(t.maxhp * 0.35) + 10, { quick: true });
       await B.wait(40);
     },
   },
@@ -361,7 +366,7 @@ const SKILLS = {
     async run(B, u, ts) {
       await B.log(`${u.name} rumbles... and it POURS!`);
       Sound.sfx('sfx_thunder');
-      for (const t of ts) { if (t.alive) { await B.attack(u, t, { power: 0.9, fx: 'splash', quick: true }); if (t.alive) await B.mood(t, 'gloomy', { quick: true }); } }
+      for (const t of ts) { if (t.alive) { await B.attack(u, t, { power: 1.1, fx: 'splash', quick: true }); if (t.alive) await B.mood(t, 'gloomy', { quick: true }); } }
     },
   },
 };
@@ -437,46 +442,46 @@ const moodToy = (name, price, mood, desc, order) => ({
   async run(B, u, t) {
     await B.log(`${u.name} uses the ${name} on ${t.name}!`);
     Sound.sfx('sfx_throw');
-    if (mood === 'gloomy' && t.side === 'enemy') await B.attack(u, t, { fixed: 12, quick: true, fx: 'splash', sfx: 'sfx_splash' });
+    if (mood === 'gloomy' && t.side === 'enemy') await B.attack(u, t, { fixed: 18, quick: true, fx: 'splash', sfx: 'sfx_splash' });
     if (t.alive) await B.mood(t, mood);
   },
 });
 
 const ITEMS = {
   // treats
-  cookie: healItem('Crumb Cookie', 10, 40, 0, 'A crunchy cookie. Heals 40 HEART.', 1),
-  toast: healItem('Buttered Toast', 28, 90, 0, 'Warm and buttery. Heals 90 HEART.', 2),
-  pancakes: healItem('Pancake Stack', 65, 180, 0, 'Fluffy stack with syrup. Heals 180 HEART.', 3),
-  jelly: healItem('Jelly Jar', 55, 60, 0, 'Wobbly! Heals 60 HEART for everyone.', 4, { target: 'allies' }),
-  gummy: healItem('Gummy Worm', 8, 0, 12, 'Chewy. Restores 12 PEP.', 5),
-  warm_milk: healItem('Warm Milk', 20, 0, 28, 'Cozy. Restores 28 PEP.', 6),
-  cocoa: healItem('Cocoa', 48, 0, 60, 'With tiny marshmallows. Restores 60 PEP.', 7),
-  lemonade: healItem('Lemonade', 24, 40, 15, 'Sweet and sour. Heals 40 HEART and 15 PEP.', 8),
-  soup: healItem('Chicken Soup', 45, 0, 0, 'Makes anyone feel better. Revives a downed friend with half HEART.', 9, { target: 'allyDown', revive: 0.5 }),
-  cake: healItem('Birthday Cake', 0, 'full', 'full', 'A whole cake! Fully heals and revives everyone.', 10, { target: 'allies', revive: 1 }),
+  cookie: healItem('Crumb Cookie', 10, 50, 0, 'A crunchy cookie. Heals 50 HEART.', 1),
+  toast: healItem('Buttered Toast', 28, 110, 0, 'Warm and buttery. Heals 110 HEART.', 2),
+  pancakes: healItem('Pancake Stack', 65, 220, 0, 'Fluffy stack with syrup. Heals 220 HEART.', 3),
+  jelly: healItem('Jelly Jar', 55, 75, 0, 'Wobbly! Heals 75 HEART for everyone.', 4, { target: 'allies' }),
+  gummy: healItem('Gummy Worm', 8, 0, 15, 'Chewy. Restores 15 PEP.', 5),
+  warm_milk: healItem('Warm Milk', 20, 0, 35, 'Cozy. Restores 35 PEP.', 6),
+  cocoa: healItem('Cocoa', 48, 0, 75, 'With tiny marshmallows. Restores 75 PEP.', 7),
+  lemonade: healItem('Lemonade', 24, 50, 20, 'Sweet and sour. Heals 50 HEART and 20 PEP.', 8),
+  soup: healItem('Chicken Soup', 45, 0, 0, 'Makes anyone feel better. Revives a downed friend with 60% HEART.', 9, { target: 'allyDown', revive: 0.6 }),
+  cake: healItem('Birthday Cake', 150, 'full', 'full', 'A whole cake! Fully heals and revives everyone.', 10, { target: 'allies', revive: 1 }),
   // trinkets
   bubbles: moodToy('Bubble Wand', 14, 'cheery', 'Blow bubbles at anyone. Makes them CHEERY.', 20),
   balloon: moodToy('Water Balloon', 14, 'gloomy', 'Splash! Makes anyone GLOOMY (and a bit wet).', 21),
   cushion: moodToy('Whoopee Cushion', 14, 'huffy', 'Pffffbt. Makes anyone HUFFY.', 22),
   duck: {
-    name: 'Rubber Duck', type: 'trinket', price: 20, target: 'foe', desc: 'Throw it! Deals 45 damage. Squeak.', order: 23, icon: 'trinket',
-    async run(B, u, t) { await B.log(`${u.name} throws a rubber duck at ${t.name}!`); Sound.sfx('sfx_squeak'); await B.attack(u, t, { fixed: 45, fx: 'crash' }); },
+    name: 'Rubber Duck', type: 'trinket', price: 20, target: 'foe', desc: 'Throw it! Deals 60 damage. Squeak.', order: 23, icon: 'trinket',
+    async run(B, u, t) { await B.log(`${u.name} throws a rubber duck at ${t.name}!`); Sound.sfx('sfx_squeak'); await B.attack(u, t, { fixed: 60, fx: 'crash' }); },
   },
   popper: {
-    name: 'Party Popper', type: 'trinket', price: 34, target: 'foes', desc: 'POP! Deals 30 damage to all foes.', order: 24, icon: 'trinket',
-    async run(B, u, ts) { await B.log(`${u.name} pulls a party popper! POP!`); Sound.sfx('sfx_boom'); for (const t of ts) if (t.alive) await B.attack(u, t, { fixed: 30, quick: true, fx: 'confetti' }); },
+    name: 'Party Popper', type: 'trinket', price: 34, target: 'foes', desc: 'POP! Deals 40 damage to all foes.', order: 24, icon: 'trinket',
+    async run(B, u, ts) { await B.log(`${u.name} pulls a party popper! POP!`); Sound.sfx('sfx_boom'); for (const t of ts) if (t.alive) await B.attack(u, t, { fixed: 40, quick: true, fx: 'confetti' }); },
   },
   snowglobe: {
     name: 'Snow Globe', type: 'trinket', price: 30, target: 'foe', desc: 'So pretty... Puts a foe to sleep.', order: 25, icon: 'trinket',
-    async run(B, u, t) { await B.log(`${u.name} shows ${t.name} a snow globe. So pretty...`); Sound.sfx('sfx_sleep'); if (!t.boss || U.chance(0.35)) B.setStatus(t, 'sleepy', 3); else B.popText(t, 'resisted!', '#8a7f86'); await B.wait(24); },
+    async run(B, u, t) { await B.log(`${u.name} shows ${t.name} a snow globe. So pretty...`); Sound.sfx('sfx_sleep'); if (!t.boss || U.chance(0.5)) B.setStatus(t, 'sleepy', 3); else B.popText(t, 'resisted!', '#8a7f86'); await B.wait(24); },
   },
   kazoo: {
     name: 'Kazoo', type: 'trinket', price: 18, target: 'foes', desc: 'Bzzzrt! Gives every foe a random mood.', order: 26, icon: 'trinket',
     async run(B, u, ts) { await B.log(`${u.name} plays the kazoo. BZZZZRT!`); for (const t of ts) if (t.alive) await B.mood(t, U.pick(['cheery', 'gloomy', 'huffy']), { quick: true }); await B.wait(12); },
   },
   tea: {
-    name: 'Calming Tea', type: 'trinket', price: 22, target: 'any', desc: 'Calms anyone down (clears their mood) and heals a little.', order: 27, icon: 'trinket',
-    async run(B, u, t) { await B.log(`${u.name} offers ${t.name} a cup of calming tea.`); B.setMood(t, 'neutral', 0); B.popText(t, 'calm', '#8a7f86'); if (t.side === 'party') await B.heal(t, Math.round(t.maxhp * 0.15)); else await B.wait(20); },
+    name: 'Calming Tea', type: 'trinket', price: 22, target: 'any', desc: 'Calms anyone down (clears their mood). Heals a friend a quarter of their HEART.', order: 27, icon: 'trinket',
+    async run(B, u, t) { await B.log(`${u.name} offers ${t.name} a cup of calming tea.`); B.setMood(t, 'neutral', 0); B.popText(t, 'calm', '#8a7f86'); if (t.side === 'party') await B.heal(t, Math.round(t.maxhp * 0.25)); else await B.wait(20); },
   },
   // stickers (equipment)
   st_star: { name: 'Gold Star', type: 'sticker', price: 60, bonus: { atk: 3, luck: 4 }, desc: 'You did great! +3 ATK, +4 LUCK.', order: 40, icon: 'sticker' },
@@ -800,4 +805,4 @@ const TROOPS = {
 };
 
 window.DB = DB; window.MOODS = MOODS; window.ACTORS = ACTORS; window.SKILLS = SKILLS; window.TOGETHER = TOGETHER;
-window.ITEMS = ITEMS; window.ENEMIES = ENEMIES; window.TROOPS = TROOPS; window.blendOf = blendOf;
+window.ITEMS = ITEMS; window.ENEMIES = ENEMIES; window.TROOPS = TROOPS; window.blendOf = blendOf; window.moodName = moodName;

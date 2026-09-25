@@ -753,7 +753,7 @@ MAPS.yard_after = Object.assign({}, MAPS.yard, {
   events: [
     { id: 'mom_garden', x: 4, y: 11, sprite: 'chr_mom', dir: 'right', async run(E) { await E.say('mom', 'Look! The tulips came back. They always come back.', 'smile'); } },
     { id: 'okafor2', x: 18, y: 7, sprite: 'npc_okafor', dir: 'left', counter: true, async run(E) { await E.say('okafor', 'Your mother is looking better, dear.'); await E.say('pim', 'She has good days and bad days. It\'s okay to have bad days.', 'neutral'); await E.say('okafor', 'That\'s very wise.'); await E.say('pim', 'My cat told me.', 'cheery'); } },
-    { id: 'end_trigger', x: 10, y: 12, w: 2, trigger: 'touch', solid: false, async run(E) { await Story.finale(E); } },
+    { id: 'end_trigger', x: 10, y: 12, w: 2, h: 2, trigger: 'touch', solid: false, async run(E) { await Story.finale(E); } },   // two rows: the path can't be joined below it
   ],
   async onEnter(E) {
     if (E.flag('epi_intro')) return;

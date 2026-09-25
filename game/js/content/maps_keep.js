@@ -91,8 +91,9 @@ MAPS.keep_2 = {
     wispNpc('wisp3', 11, 8, ['She loves you, you know.', 'She\'s just very, very tired. It\'s the kind of tired sleep doesn\'t fix.']),
     wispNpc('wisp4', 18, 4, ['She tried to get up this morning. She really did.', 'Sometimes trying is all you can do.']),
     scrapEvent('scrap_keep', 25, 13),
-    { id: 'reveal_zone', x: 11, y: 4, w: 6, trigger: 'touch', solid: false, cond: () => !State.flag('momo_reveal'), async run(E) { await Story.momoReveal(E); } },
-    { id: 'hall_door', x: 13, y: 2, w: 2, solid: true, cond: () => !State.flag('momo_reveal'), async run(E) { await E.say(null, 'A big soft door. Rain is seeping out from under it.'); } },
+    // everywhere in front of the door (both rows), so the door can't be reached without it
+    { id: 'reveal_zone', x: 11, y: 3, w: 6, h: 2, trigger: 'touch', solid: false, cond: () => !State.flag('momo_reveal'), async run(E) { await Story.momoReveal(E); } },
+    { id: 'hall_door', x: 13, y: 2, w: 2, solid: true, cond: () => !State.flag('momo_reveal'), async run(E) { await E.say(null, 'A big soft door. Rain is seeping out from under it.'); await Story.momoReveal(E); } },
   ],
   enemies: [
     { troop: 'keep_3', sprite: 'en_laundry', x: 9, y: 12, dh: 70, chase: 3 },
@@ -110,8 +111,8 @@ MAPS.keep_3 = {
   props: [['queen_throne', 8, 2], ['lantern', 3, 7], ['lantern', 16, 7], ['puddle', 5, 10], ['puddle', 13, 11], ['tissue_box', 14, 4]],
   exits: [{ x: 8, y: 15, w: 3, to: 'keep_2', tx: 13, ty: 3, tdir: 'down', dir: 'down', cond: () => !State.flag('queen_done') }],
   events: [
-    { id: 'queen', x: 9, y: 3, w: 2, sprite: 'en_rainqueen', dh: 300, still: true, solid: true, trigger: 'none', cond: () => !State.flag('queen_done'), sortOff: 20 },
-    { id: 'boss_zone', x: 3, y: 8, w: 14, trigger: 'touch', solid: false, cond: () => !State.flag('queen_done'), async run(E) { await Story.queenFight(E); } },
+    { id: 'queen', x: 9, y: 3, w: 2, sprite: 'en_rainqueen', dh: 300, still: true, solid: true, face: false, cond: () => !State.flag('queen_done'), sortOff: 20, async run(E) { await Story.queenFight(E); } },
+    { id: 'boss_zone', x: 2, y: 8, w: 17, trigger: 'touch', solid: false, cond: () => !State.flag('queen_done'), async run(E) { await Story.queenFight(E); } },   // the whole width
   ],
 };
 

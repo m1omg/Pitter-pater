@@ -397,7 +397,8 @@ class BattleScene {
     const u = act.user;
     if (act.type === 'guard') {
       u.guard = true;
-      await this.log(`${u.name} is being careful.`);
+      await this.log(`${u.name} is being careful, and catches their breath.`);
+      await this.restorePep(u, Math.max(3, Math.round(u.maxpep * 0.12)), { quick: true });
       this.addGauge(4);
       return;
     }
@@ -418,7 +419,7 @@ class BattleScene {
       if (t === null) { await this.log(`${u.name} was going to use ${sk.name}, but there's no need anymore.`); return; }
       u.pep -= sk.cost;
       await sk.run(this, u, t);
-      this.addGauge(8);
+      this.addGauge(12);
       return;
     }
     if (act.type === 'item') {
@@ -428,7 +429,7 @@ class BattleScene {
       if (t === null) { await this.log(`${u.name} puts the ${it.name} away. Nobody needs it right now.`); return; }
       State.removeItem(act.item, 1);
       await it.run(this, u, t);
-      this.addGauge(6);
+      this.addGauge(10);
       return;
     }
     if (act.type === 'together') {
@@ -521,6 +522,7 @@ class BattleScene {
       const cc = o.noCrit ? 0 : 0.03 + this.stat(u, 'luck') * 0.004 + this.moodVal(u, 'crit');
       if (Math.random() < cc) { crit = true; dmg *= 1.5; }
     }
+    if (u.side === 'enemy') dmg *= DIFFICULTY.dmg;
     if (t.mood === 'overwhelmed') dmg *= MOODS.overwhelmed.takeMult;
     if (t.guard) dmg *= t.shelterGuard ? 0.7 : 0.5;
     if (t.protectedBy && t.protectedBy.alive && t.protectedBy !== t) dmg *= 0.65;
@@ -623,7 +625,7 @@ class BattleScene {
       next = 'overwhelmed'; lv = 1;
     } else if (cur === 'overwhelmed') { if (!o.quick) await this.wait(10); return; }
     this.setMood(t, next, lv);
-    const name = MOODS[next].lvName ? MOODS[next].lvName[lv - 1] : MOODS[next].name;
+    const name = moodName(next, lv);
     const text = `${t.name} ${next === 'overwhelmed' ? 'is' : 'feels'} ${name}!`;
     if (next === 'overwhelmed') { this.addGauge(12); Game.shake(5, 18); }
     if (msg) await this.log(msg, { quick: true });
@@ -1090,7 +1092,7 @@ class BattleScene {
     Gfx.tag(ctx, x - 6, y - 16, b.name, { fill: CHARACTERS[b.id] ? CHARACTERS[b.id].color : '#ffd9a8', size: 18 });
     if (b.mood !== 'neutral' && b.alive) {
       Gfx.icon(ctx, MOODS[b.mood].icon, x + r.w - 26, y + 30, 14);
-      const nm = MOODS[b.mood].lvName ? MOODS[b.mood].lvName[b.moodLv - 1] : MOODS[b.mood].name;
+      const nm = moodName(b.mood, b.moodLv);
       Gfx.text(ctx, nm, x + r.w - 20, y + ph + 4, { size: 16, font: Gfx.BOLD, align: 'right', color: '#fff', outline: Gfx.C.ink, outlineWidth: 4 });
     }
     // statuses
@@ -1264,7 +1266,7 @@ class BattleScene {
     if (ui.type === 'target') {
       const t = ui.cands[ui.index];
       const label = t.side === 'enemy' ? `${t.name}  ${t.hp}/${t.maxhp}` : t.name;
-      const extra = t.mood !== 'neutral' ? '  · ' + (MOODS[t.mood].lvName ? MOODS[t.mood].lvName[t.moodLv - 1] : MOODS[t.mood].name) : '';
+      const extra = t.mood !== 'neutral' ? '  · ' + moodName(t.mood, t.moodLv) : '';
       const w = Gfx.measure(ctx, label + extra, 24, Gfx.FONT) + 50;
       Gfx.box(ctx, Game.W / 2 - w / 2, 88, w, 44, { fill: '#fff3dc' });
       Gfx.text(ctx, label + extra, Game.W / 2, 118, { size: 24, align: 'center' });

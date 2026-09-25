@@ -25,11 +25,12 @@ Or download this repository and use any of these (no install needed):
 | Key | Action |
 |---|---|
 | Arrow keys / WASD | walk, move cursors |
-| Z / Enter / Space | talk, examine, confirm |
-| X / Esc | cancel, open the menu |
-| Shift (hold) | run |
+| Z / Enter | talk, examine, confirm |
+| X / Shift / Esc | cancel, open the menu |
+| Space (hold) | run |
 | F4 | fullscreen |
 
+Every key except the arrows, Enter and Esc can be changed in OPTIONS → *Controls*.
 Gamepads work too (A = confirm, B = cancel).
 
 **Touch screens (phones and tablets):**
@@ -58,6 +59,7 @@ Turn-based, with a party of up to four. Feelings work like weather:
 * **CHEERY** ☀ faster and luckier, but careless · **GLOOMY** ☂ sturdier and slower, regains PEP · **HUFFY** ⚡ hits hard, guards badly
 * Mix two and you get a new one: **RAINBOW** (heals every turn), **STORMY** (tough but sulky), **HEATWAVE** (fierce but burning out)
 * Mix all three and the target is **OVERWHELMED**: it loses a turn and takes extra damage.
+* **GUARD** halves the damage you take and lets you catch your breath (a little PEP back). Skills and items fill the TOGETHER meter faster than plain attacks.
 * Acting together fills the **TOGETHER** meter. When it's full, use a team move: it takes the whole party's turn.
 * **Trinkets** are battle toys, used from ITEMS on someone's turn: bubble wands, water balloons and whoopee cushions
   make anyone CHEERY, GLOOMY or HUFFY (on foes or friends), others deal damage, put a foe to sleep or calm someone down.

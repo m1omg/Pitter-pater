@@ -199,7 +199,7 @@ MAPS.crumb_town = {
           await E.say('gumball', 'WELCOME TO GUMBALL\'S! Everything costs marbles!');
           await E.say('gumball', 'Don\'t ask me why. I\'m a gumball machine. I don\'t make the rules. I just dispense.');
         }
-        await E.shop(['cookie', 'toast', 'gummy', 'warm_milk', 'lemonade', 'bubbles', 'balloon', 'cushion', 'duck', 'st_bandaid'], { title: "GUMBALL'S" });
+        await E.shop(['cookie', 'toast', 'gummy', 'warm_milk', 'lemonade', 'soup', 'bubbles', 'balloon', 'cushion', 'duck', 'st_bandaid'], { title: "GUMBALL'S" });
       },
     },
     {
@@ -368,7 +368,11 @@ MAPS.crumb_peak = {
   events: [
     saveEvent('save', 6, 12, 'A little candle flickers on the mountainside. Everyone feels rested.'),
     {
-      id: 'boss_zone', x: 6, y: 6, w: 8, trigger: 'touch', solid: false, cond: () => !State.flag('grumbles_down'),
+      id: 'boss_zone', x: 4, y: 6, w: 13, trigger: 'touch', solid: false, cond: () => !State.flag('grumbles_down'),   // the whole width, so nobody slips past
+      async run(E) { await Story.grumblesFight(E); },
+    },
+    {
+      id: 'toaster_wake', x: 8, y: 3, w: 4, solid: false, cond: () => !State.flag('grumbles_down'),
       async run(E) { await Story.grumblesFight(E); },
     },
     {
