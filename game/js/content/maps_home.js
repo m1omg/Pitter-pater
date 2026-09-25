@@ -78,12 +78,12 @@ MAPS.pim_room = {
         if (ch() >= 4) { await E.say(null, 'Pim\'s drawing for the art show. A rainbow and a little pink heart. The sun never got drawn in.'); await E.say('pim', think('The art show was yesterday.'), 'forced'); return; }
         await E.say(null, 'Pim\'s drawing for the art show. A rainbow and a little pink heart.');
         await E.say('pim', think('It\'s not finished. It needs a big yellow sun, but I can\'t decide if the sun should have a face.'), 'neutral');
+        await E.say(null, 'Pinned to the wall above the desk: drawings of the sun. Lots and lots of suns.');
       },
     },
     { id: 'window', x: 4, y: 2, w: 2, solid: false, async run(E) { await E.say(null, 'Rain on the window. The street outside is grey and empty.'); } },
     { id: 'books', x: 6, y: 3, w: 2, solid: false, async run(E) { await E.say(null, 'Picture books. {c:red}The Very Brave Umbrella{/c} has a broken spine from being read so many times.'); await E.say('pim', think('Dad did all the voices.'), 'neutral'); } },
     { id: 'toys', x: 10, y: 7, solid: false, async run(E) { await E.say(null, 'A box of old toys. Pim is too old for most of them.'); await E.say(null, 'She keeps them anyway.'); } },
-    { id: 'drawings', x: 8, y: 2, w: 2, solid: false, async run(E) { await E.say(null, 'Drawings of the sun. Lots and lots of suns.'); } },
     {
       id: 'calendar', x: 10, y: 2, solid: false,
       draw2(ctx) {

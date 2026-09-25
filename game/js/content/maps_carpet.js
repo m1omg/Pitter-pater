@@ -36,7 +36,7 @@ MAPS.carpet_1 = {
   ],
   events: [
     signEvent('sign_c1', 16, 3, ['{c:green}FLUFFTON{/c} - north, under the Great Couch.', '{c:grey}STATIC WOODS{/c} - west. Do not go there.', 'Seriously.']),
-    presentEvent('gift_ca', 30, 5, 'pancakes', 1),
+    presentEvent('gift_ca', 29, 6, 'pancakes', 1),   // on the carpet, next to the potted plant (30,5 was off the edge)
     presentEvent('gift_cb', 4, 7, 'popper', 2, { color: '#ffe38a' }),
     presentEvent('gift_cc', 22, 19, 'marbles', 30, { color: '#b8f0a8' }),
     scrapEvent('scrap_carpet', 4, 18),
