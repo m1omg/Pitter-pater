@@ -169,7 +169,9 @@ class BattleScene {
     // stickers that give starting moods
     for (const b of this.party) if (b.alive && b.sticker && b.sticker.startMood) this.setMood(b, b.sticker.startMood, 1);
     const names = [...new Set(this.enemies.map((e) => e.name))];
-    await this.log(this.troop.intro || (this.enemies.length === 1 ? `${names[0]} blocks the way!` : `${names.join(' and ')} appear!`));
+    const plural = (n) => (/[^AEIOU]Y$/.test(n) ? n.slice(0, -1) + 'IES' : /(S|SH|CH|X)$/.test(n) ? n + 'ES' : n + 'S');
+    const list = names.length > 1 ? names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1] : plural(names[0]);
+    await this.log(this.troop.intro || (this.enemies.length === 1 ? `${names[0]} blocks the way!` : `${list} appear!`));
     if (this.troop.onStart) await this.troop.onStart(this);
     while (true) {
       this.turn++;

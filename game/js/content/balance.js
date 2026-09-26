@@ -33,3 +33,13 @@ for (const id in ENEMIES) if (!ENEMIES[id].boss) ENEMIES[id].h = Math.round(ENEM
 // Regular fights (not bosses, nor the helpers a boss calls in) get extra on top: regularHp / regularDmg.
 const DIFFICULTY = { hp: 1.12, dmg: 1.13, regularHp: 1.3, regularDmg: 1.15 };
 for (const id in ENEMIES) if (ENEMIES[id].hp) ENEMIES[id].hp = Math.round(ENEMIES[id].hp * DIFFICULTY.hp);
+
+// One more enemy in every regular fight, from the same part of Puddleton. The very first ones
+// (the tutorial Drizzlet and the first Grumpy Toast) still come alone, to ease you in.
+const EXTRA_ENEMY = {
+  crumb_2: 'sugarmite', crumb_3: 'lemon', crumb_4: 'lemon', crumb_5: 'drizzlet', crumb_6: 'toast',
+  carpet_1: 'lintmoth', carpet_2: 'dustbunny', carpet_3: 'sock', carpet_4: 'dustbunny',
+  static_1: 'staticghost', static_2: 'remote', static_3: 'staticghost',
+  keep_1: 'umbrellabat', keep_2: 'rainwisp', keep_3: 'rainwisp', keep_4: 'tissue',
+};
+for (const id in EXTRA_ENEMY) TROOPS[id].enemies.push(EXTRA_ENEMY[id]);
