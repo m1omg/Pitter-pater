@@ -350,6 +350,7 @@ class OptionsPanel {
       { label: 'Text speed', get: () => ['Slow', 'Normal', 'Fast', 'Instant'][[0.5, 1, 2, 9].indexOf(State.options.textSpeed)] || 'Normal', change: (d) => { const v = [0.5, 1, 2, 9]; let i = v.indexOf(State.options.textSpeed); if (i < 0) i = 1; State.options.textSpeed = v[U.clamp(i + d, 0, 3)]; } },
       { label: 'Music volume', get: () => Math.round(State.options.bgm * 10) + '/10', change: (d) => { State.options.bgm = U.clamp(Math.round(State.options.bgm * 10 + d) / 10, 0, 1); } },
       { label: 'Sound volume', get: () => Math.round(State.options.sfx * 10) + '/10', change: (d) => { State.options.sfx = U.clamp(Math.round(State.options.sfx * 10 + d) / 10, 0, 1); Sound.applyVolumes(); Sound.sfx('sfx_cursor'); } },
+      { label: 'Difficulty', get: () => difficulty().name, change: (d) => { const o = DIFFICULTY_ORDER; let i = o.indexOf(State.options.difficulty); if (i < 0) i = 1; State.options.difficulty = o[U.clamp(i + d, 0, o.length - 1)]; } },
       { label: 'Always run', get: () => (State.options.alwaysRun ? 'On' : 'Off'), change: () => { State.options.alwaysRun = !State.options.alwaysRun; } },
       { label: 'Screen shake', get: () => (State.options.screenShake ? 'On' : 'Off'), change: () => { State.options.screenShake = !State.options.screenShake; } },
       { label: Input.isTouchUI() ? 'Fullscreen' : 'Fullscreen (F4)', get: () => (document.fullscreenElement ? 'On' : 'Off'), change: () => Input.toggleFullscreen() },

@@ -50,10 +50,16 @@ class BattleScene {
     });
   }
 
+  // the troop's enemies, with one more in regular fights on the harder difficulties (balance.js)
+  troopEnemies() {
+    const extra = difficulty().extraEnemy && EXTRA_ENEMY[this.troopId];
+    return extra ? [...this.troop.enemies, extra] : this.troop.enemies;
+  }
+
   makeEnemy(id) {
     const d = ENEMIES[id];
-    const regular = !d.boss && !this.troop.boss;   // regular fights are a bit tougher (balance.js)
-    const hp = Math.round(d.hp * (regular ? DIFFICULTY.regularHp : 1));
+    const L = difficulty(), regular = !d.boss && !this.troop.boss;   // regular fights are a bit tougher (balance.js)
+    const hp = Math.round(d.hp * L.hp * (regular ? L.regularHp : 1));
     const e = {
       side: 'enemy', id, name: d.name, def_: d, hp, maxhp: hp, pep: 0, maxpep: 0, regular,
       atk: d.atk, def: d.def, spd: d.spd, luck: d.luck || 5, mood: 'neutral', moodLv: 0,
@@ -79,7 +85,7 @@ class BattleScene {
     this.prevScene = Game.scene;
     this.snapshot = State.snapshot();
     this.makeParty();
-    this.enemies = this.troop.enemies.map((id) => this.makeEnemy(id));
+    this.enemies = this.troopEnemies().map((id) => this.makeEnemy(id));
     this.layoutEnemies(false);
     for (const e of this.enemies) e.drop = -600;
     // transition
@@ -526,7 +532,7 @@ class BattleScene {
       const cc = o.noCrit ? 0 : 0.03 + this.stat(u, 'luck') * 0.004 + this.moodVal(u, 'crit');
       if (Math.random() < cc) { crit = true; dmg *= 1.5; }
     }
-    if (u.side === 'enemy') dmg *= DIFFICULTY.dmg * (u.regular ? DIFFICULTY.regularDmg : 1);
+    if (u.side === 'enemy') { const L = difficulty(); dmg *= L.dmg * (u.regular ? L.regularDmg : 1); }
     if (t.mood === 'overwhelmed') dmg *= MOODS.overwhelmed.takeMult;
     if (t.guard) dmg *= t.shelterGuard ? 0.7 : 0.5;
     if (t.protectedBy && t.protectedBy.alive && t.protectedBy !== t) dmg *= 0.65;
@@ -770,7 +776,7 @@ class BattleScene {
   async beginRetry() {
     this.snapshot = State.snapshot();
     this.makeParty();
-    this.enemies = this.troop.enemies.map((id) => this.makeEnemy(id));
+    this.enemies = this.troopEnemies().map((id) => this.makeEnemy(id));
     this.layoutEnemies(false);
     for (const e of this.enemies) e.drop = -600;
     Game.setScene(this);

@@ -67,6 +67,10 @@ Turn-based, with a party of up to four. Feelings work like weather:
 
 Enemies don't die, they *calm down*.
 
+OPTIONS → *Difficulty* can be changed at any time: **Gentle** (the first release's battles), **Normal**,
+**Hard** and **Very hard**. Above Gentle, enemies are tougher and regular fights bring one more enemy
+(the very first ones still come alone).
+
 ## Credits
 
 * Story, design, code and music: Claude (Anthropic).

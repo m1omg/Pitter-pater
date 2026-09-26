@@ -6,7 +6,7 @@ const SAVE_PREFIX = 'pitterpatter_save_';
 const OPTIONS_KEY = 'pitterpatter_options';
 
 const State = {
-  options: { textSpeed: 1, bgm: 0.7, sfx: 0.8, master: 0.9, alwaysRun: false, screenShake: true, touchStick: false, keys: null },   // keys: null = default controls
+  options: { textSpeed: 1, bgm: 0.7, sfx: 0.8, master: 0.9, alwaysRun: false, screenShake: true, touchStick: false, keys: null, difficulty: 'normal' },   // keys: null = default controls
   data: null,
 
   loadOptions() {

@@ -28,18 +28,23 @@ for (const id in TUNE) Object.assign(ENEMIES[id], TUNE[id]);
 // the painted battle backgrounds are busy: show regular enemies a little bigger
 for (const id in ENEMIES) if (!ENEMIES[id].boss) ENEMIES[id].h = Math.round(ENEMIES[id].h * 1.15);
 
-// Harder than the first release: enemies have 12% more HEART and hit 13% harder (about 27% more damage
-// taken per fight: +15%, then +10% on top). Skills and items got stronger (database.js), so they pay off.
-// Regular fights (not bosses, nor the helpers a boss calls in) get extra on top: regularHp / regularDmg.
-const DIFFICULTY = { hp: 1.12, dmg: 1.13, regularHp: 1.3, regularDmg: 1.15 };
-for (const id in ENEMIES) if (ENEMIES[id].hp) ENEMIES[id].hp = Math.round(ENEMIES[id].hp * DIFFICULTY.hp);
+// Difficulty (OPTIONS > Difficulty, kept with the settings, not the saves). Enemy HEART (hp) and hit
+// strength (dmg); regular fights (not bosses, nor the helpers a boss calls in) get regularHp / regularDmg
+// on top, and one more enemy (EXTRA_ENEMY). Gentle is the first release's numbers.
+const DIFFICULTIES = {
+  gentle: { name: 'Gentle', hp: 1, dmg: 1, regularHp: 1, regularDmg: 1, extraEnemy: false },
+  normal: { name: 'Normal', hp: 1.16, dmg: 1.17, regularHp: 1.3, regularDmg: 1.15, extraEnemy: true },
+  hard: { name: 'Hard', hp: 1.3, dmg: 1.3, regularHp: 1.35, regularDmg: 1.2, extraEnemy: true },
+  veryhard: { name: 'Very hard', hp: 1.5, dmg: 1.45, regularHp: 1.4, regularDmg: 1.25, extraEnemy: true },
+};
+const DIFFICULTY_ORDER = ['gentle', 'normal', 'hard', 'veryhard'];
+function difficulty() { return DIFFICULTIES[State.options.difficulty] || DIFFICULTIES.normal; }
 
-// One more enemy in every regular fight, from the same part of Puddleton. The very first ones
-// (the tutorial Drizzlet and the first Grumpy Toast) still come alone, to ease you in.
+// The one more enemy of each regular fight, from the same part of Puddleton. The very first ones
+// (the tutorial Drizzlet and the first Grumpy Toast) always come alone, to ease you in.
 const EXTRA_ENEMY = {
   crumb_2: 'sugarmite', crumb_3: 'lemon', crumb_4: 'lemon', crumb_5: 'drizzlet', crumb_6: 'toast',
   carpet_1: 'lintmoth', carpet_2: 'dustbunny', carpet_3: 'sock', carpet_4: 'dustbunny',
   static_1: 'staticghost', static_2: 'remote', static_3: 'staticghost',
   keep_1: 'umbrellabat', keep_2: 'rainwisp', keep_3: 'rainwisp', keep_4: 'tissue',
 };
-for (const id in EXTRA_ENEMY) TROOPS[id].enemies.push(EXTRA_ENEMY[id]);
