@@ -28,7 +28,7 @@ for (const id in TUNE) Object.assign(ENEMIES[id], TUNE[id]);
 // the painted battle backgrounds are busy: show regular enemies a little bigger
 for (const id in ENEMIES) if (!ENEMIES[id].boss) ENEMIES[id].h = Math.round(ENEMIES[id].h * 1.15);
 
-// A little harder: enemies have 7% more HEART and hit 8% harder (about 15% more damage taken per fight).
-// Skills and items got stronger to match (database.js), so playing with them pays off.
-const DIFFICULTY = { hp: 1.07, dmg: 1.08 };
+// Harder than the first release: enemies have 12% more HEART and hit 13% harder (about 27% more damage
+// taken per fight: +15%, then +10% on top). Skills and items got stronger (database.js), so they pay off.
+const DIFFICULTY = { hp: 1.12, dmg: 1.13 };
 for (const id in ENEMIES) if (ENEMIES[id].hp) ENEMIES[id].hp = Math.round(ENEMIES[id].hp * DIFFICULTY.hp);
