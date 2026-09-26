@@ -52,8 +52,10 @@ class BattleScene {
 
   makeEnemy(id) {
     const d = ENEMIES[id];
+    const regular = !d.boss && !this.troop.boss;   // regular fights are a bit tougher (balance.js)
+    const hp = Math.round(d.hp * (regular ? DIFFICULTY.regularHp : 1));
     const e = {
-      side: 'enemy', id, name: d.name, def_: d, hp: d.hp, maxhp: d.hp, pep: 0, maxpep: 0,
+      side: 'enemy', id, name: d.name, def_: d, hp, maxhp: hp, pep: 0, maxpep: 0, regular,
       atk: d.atk, def: d.def, spd: d.spd, luck: d.luck || 5, mood: 'neutral', moodLv: 0,
       statuses: {}, buffs: {}, alive: true, boss: !!d.boss, sprite: d.sprite, h: d.h || 180,
       x: Game.W / 2, y: 470, drawX: Game.W / 2, drop: 0, alpha: 1, shakeT: 0, flashT: 0, lunge: 0, ghostHp: 1, seed: Math.random() * 10,
@@ -522,7 +524,7 @@ class BattleScene {
       const cc = o.noCrit ? 0 : 0.03 + this.stat(u, 'luck') * 0.004 + this.moodVal(u, 'crit');
       if (Math.random() < cc) { crit = true; dmg *= 1.5; }
     }
-    if (u.side === 'enemy') dmg *= DIFFICULTY.dmg;
+    if (u.side === 'enemy') dmg *= DIFFICULTY.dmg * (u.regular ? DIFFICULTY.regularDmg : 1);
     if (t.mood === 'overwhelmed') dmg *= MOODS.overwhelmed.takeMult;
     if (t.guard) dmg *= t.shelterGuard ? 0.7 : 0.5;
     if (t.protectedBy && t.protectedBy.alive && t.protectedBy !== t) dmg *= 0.65;

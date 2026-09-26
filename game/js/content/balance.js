@@ -30,5 +30,6 @@ for (const id in ENEMIES) if (!ENEMIES[id].boss) ENEMIES[id].h = Math.round(ENEM
 
 // Harder than the first release: enemies have 12% more HEART and hit 13% harder (about 27% more damage
 // taken per fight: +15%, then +10% on top). Skills and items got stronger (database.js), so they pay off.
-const DIFFICULTY = { hp: 1.12, dmg: 1.13 };
+// Regular fights (not bosses, nor the helpers a boss calls in) get extra on top: regularHp / regularDmg.
+const DIFFICULTY = { hp: 1.12, dmg: 1.13, regularHp: 1.3, regularDmg: 1.15 };
 for (const id in ENEMIES) if (ENEMIES[id].hp) ENEMIES[id].hp = Math.round(ENEMIES[id].hp * DIFFICULTY.hp);
