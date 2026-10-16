@@ -14,7 +14,7 @@ class Char {
     Object.assign(this, {
       id: null, kind: 'npc', x: 0, y: 0, dir: 'down', sprite: null, dh: null,
       solid: true, visible: true, through: false, speed: WALK_SPEED,
-      moving: false, t: 0, phase: 0, animT: Math.random() * 1000, alpha: 1, hop: 0,
+      moving: false, t: 0, phase: 0, walk: 0, runAmt: 0, idleT: 0, animT: Math.random() * 1000, alpha: 1, hop: 0,
       queue: [], detached: false, stun: 0, noBob: false, scale: 1, rot: 0, seed: Math.random() * 10,
     }, o);
     this.fx = this.x; this.fy = this.y;   // fractional tile position (for drawing)
@@ -45,14 +45,12 @@ class Char {
       const p = Math.min(1, this.t);
       this.fx = U.lerp(this.fromX, this.x, p);
       this.fy = U.lerp(this.fromY, this.y, p);
-      this.phase += this.speed * Math.PI;
+      this.phase += this.speed * Math.PI;   // one step per tile; the stride carries on from tile to tile
       if (p >= 1) {
         this.moving = false;
         this.fx = this.x; this.fy = this.y;
         if (this.onArrive) { const f = this.onArrive; this.onArrive = null; f(); }
       }
-    } else {
-      this.phase = 0;
     }
     if (!this.moving && this.queue.length) {
       const cmd = this.queue[0];
@@ -66,6 +64,12 @@ class Char {
       } else if (cmd.skipBlocked || ++cmd.tries > 90) { this.queue.shift(); cmd.resolve && cmd.resolve(); }
     }
     if (this.balloon) { this.balloon.t++; if (this.balloon.t > this.balloon.n) this.balloon = null; }
+    // ease the walk in and out (a frame's pause between tiles doesn't count), so legs never snap
+    this.idleT = this.moving ? 0 : this.idleT + 1;
+    if (this.moving) this.walk = Math.min(1, this.walk + 0.25);
+    else if (this.idleT > 1) this.walk = Math.max(0, this.walk - 0.2);
+    if (!this.walk) this.phase = 0;
+    this.runAmt = U.clamp(this.runAmt + (this.moving && this.speed > WALK_SPEED * 1.2 ? 0.1 : -0.1), 0, 1);
   }
 
   draw(ctx, t) {
@@ -79,7 +83,7 @@ class Char {
       return;
     }
     Sprites.draw(ctx, this.sprite, this.px, this.py, this.dir, {
-      moving: this.moving && !this.noBob, phase: this.phase, t: this.animT, alpha: this.alpha, dh: this.dh,
+      walk: this.noBob ? 0 : this.walk, run: this.runAmt, phase: this.phase, t: this.animT, alpha: this.alpha, dh: this.dh,
       hop: this.hop, scale: this.scale, rot: this.rot, seed: this.seed, still: this.still,
       shadowW: this.shadowW, frame: this.frame, flashA: this.flashA, bobAmp: this.bobAmp,
     });

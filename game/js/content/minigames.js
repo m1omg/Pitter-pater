@@ -8,10 +8,11 @@ const Popcorn = {
     return new Promise((resolve) => {
       const W = Game.W, H = Game.H;
       const g = {
-        t: 0, time: 30 * 60, x: W / 2, vx: 0, score: 0, combo: 0, stun: 0, items: [], pops: [], done: false, started: false,
+        t: 0, time: 30 * 60, x: W / 2, vx: 0, walk: 0, score: 0, combo: 0, stun: 0, items: [], pops: [], done: false, started: false,
         update(active) {
           if (!active) return;
           this.t++;
+          this.walk = U.clamp(this.walk + (this.started && !this.done && Math.abs(this.vx) > 0.5 ? 0.25 : -0.2), 0, 1);
           if (!this.started) { if (this.t > 90) this.started = true; return; }
           if (this.done) {
             if (this.t - this.doneT > 60 && Input.isPressed('ok')) { Game.removeOverlay(g); resolve(this.score); }
@@ -67,7 +68,7 @@ const Popcorn = {
           // Pim with a bucket
           const px = this.x, py = H - 96;
           const wob = this.stun > 0 ? Math.sin(this.t * 0.5) * 0.2 : this.vx * 0.01;
-          Sprites.draw(ctx, 'chr_pim', px, py + 30, 'down', { t: this.t, moving: Math.abs(this.vx) > 0.5, phase: this.t * 0.3, rot: wob, dh: 96 });
+          Sprites.draw(ctx, 'chr_pim', px, py + 30, 'down', { t: this.t, walk: this.walk, phase: this.t * 0.3, rot: wob, dh: 96 });
           ctx.save(); ctx.translate(px, py - 40);
           ctx.fillStyle = '#e0483e'; ctx.strokeStyle = Gfx.C.ink; ctx.lineWidth = 3;
           ctx.beginPath(); ctx.moveTo(-48, -34); ctx.lineTo(48, -34); ctx.lineTo(36, 8); ctx.lineTo(-36, 8); ctx.closePath(); ctx.fill(); ctx.stroke();

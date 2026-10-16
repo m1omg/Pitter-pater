@@ -84,7 +84,8 @@ The game is released under the GPL-3.0 licence (see `LICENSE`). The bundled font
 
 * `game/js/core`: engine (loop, input, audio, drawing).
 * `game/js/game`: systems (maps, events, battles, menus).
-* `game/js/content`: story, maps, dialogue, balance.
+* `game/js/content`: story, maps, dialogue, balance. `rigs.js` marks where the legs are in each walking character's
+  sprite sheet, so the overworld walk can lift and swing them; a redrawn sheet needs its rig checked.
 * `tools/art`: image generation jobs (`jobs.py`), the Codex relay (`gen.py`) and slicing/manifest (`process.py`).
   To regenerate one picture: delete `art_raw/<name>.png`, run `python3 tools/art/gen.py --only <name>`, then
   `python3 tools/art/process.py <name>`. The raw sheets live in `art_raw/`, and the game uses the processed files in `game/img/`.
